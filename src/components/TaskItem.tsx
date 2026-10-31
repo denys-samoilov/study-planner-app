@@ -1,7 +1,11 @@
 import { Task } from '../types/task';
 
-interface TaskItemProps {
+class TaskItemProps {
   task: Task;
+  constructor(task: Task)
+  {
+    this.task = task;
+  }
 }
 
 export function TaskItem({ task }: TaskItemProps) {

@@ -1,8 +1,12 @@
 import { Task } from '../types/task';
 import { TaskItem } from './TaskItem';
 
-interface TaskListProps {
+class TaskListProps {
   tasks: Task[];
+
+  constructor(tasks: Task[]){
+    this.tasks = tasks;
+  }
 }
 
 export function TaskList({ tasks }: TaskListProps) {
@@ -18,7 +22,8 @@ export function TaskList({ tasks }: TaskListProps) {
     <div>
       {tasks.map((task) => (
         <TaskItem 
-          task={task} 
+          key={task.id}
+          task={task}
         />
       ))}
     </div>

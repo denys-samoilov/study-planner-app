@@ -1,15 +1,13 @@
 import { Task } from '../types/task';
 import { TaskItem } from './TaskItem';
 
-class TaskListProps {
+interface TaskListProps {
   tasks: Task[];
-
-  constructor(tasks: Task[]){
-    this.tasks = tasks;
-  }
+  onToggle: (id: number | string) => void;
+  onDelete: (id: number | string) => void;
 }
 
-export function TaskList({ tasks }: TaskListProps) {
+export function TaskList({ tasks, onToggle, onDelete}: TaskListProps) {
   if (tasks.length === 0) {
     return (
       <div className="alert alert-secondary text-center" role="alert">
@@ -24,6 +22,8 @@ export function TaskList({ tasks }: TaskListProps) {
         <TaskItem 
           key={task.id}
           task={task}
+          onToggle={onToggle}
+          onDelete={onDelete}
         />
       ))}
     </div>

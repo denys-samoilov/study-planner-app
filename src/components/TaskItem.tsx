@@ -1,15 +1,14 @@
 import { Task } from '../types/task';
 
-class TaskItemProps {
+interface TaskItemProps {
   task: Task;
-  constructor(task: Task)
-  {
-    this.task = task;
-  }
+  onToggle: (id: number | string) => void;
+  onDelete: (id: number | string) => void;
+
 }
 
-export function TaskItem({ task }: TaskItemProps) {
-  const getPriorityBadgeClass = (priority: string) => {
+export function TaskItem({ task, onToggle, onDelete}: TaskItemProps) {
+  const getPriorityBadgeClass = (priority: string): string => {
     switch (priority) {
       case 'high': return 'bg-danger';
       case 'medium': return 'bg-warning text-dark';
@@ -43,6 +42,19 @@ export function TaskItem({ task }: TaskItemProps) {
           </small>
 
           <div className="d-flex gap-2">
+            <button 
+              onClick={() => onToggle(task.id)}
+              className={`btn btn-sm ${task.completed ? 'btn-outline-warning' : 'btn-outline-success'}`}
+            >
+              {task.completed ? 'Return' : 'Finish'}
+            </button>
+
+            <button 
+              onClick={() => onDelete(task.id)}
+              className={`btn btn-sm btn-danger`}
+            >
+              Delete Task
+            </button>
           </div>
         </div>
       </div>

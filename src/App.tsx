@@ -4,10 +4,11 @@ import { Task } from './types/task';
 import { TaskList } from './components/TaskList';
 import { TaskForm } from './components/TaskForm';
 import { initialTasks } from './data/initialTasks';
-import { TaskFilters } from './components/TaskFilters';
+import { TaskFilters, type FilterType } from './components/TaskFilters';
 
 export function App() {
-  const [tasks, setTasks] = useState<Task[]>(initialTasks);
+  const [tasks, setTasks] = useState(initialTasks);
+  const [filter, setFilter] = useState<FilterType>('all'); 
 
   function handleAddTask(newTask: Task): void {
     setTasks((prevTasks) => [newTask, ...prevTasks]);
@@ -37,17 +38,30 @@ export function App() {
     setTasks((prevTasks) => prevTasks.filter((task) => task.id !== id));
   }
 
-
+  function filteredTasks(): Task[] {
+    switch (filter) {
+      case 'completed':
+        return tasks.filter((task) => task.completed);
+      case 'active':
+        return tasks.filter((task) => !task.completed);
+      default:
+        return tasks;
+    }
+  }
 
   return (
     <div className="container py-5" style={{ maxWidth: '700px' }}>
       <Header />
 
       <TaskForm onAddTask={handleAddTask} />
-      <TaskFilters tasks={tasks} />
+      <TaskFilters 
+      currentFilter={filter}
+      changeFilter={setFilter}
+      />
 
       <TaskList 
-        tasks={tasks} 
+        tasks={filteredTasks()} 
+        currentFilter={filter}
         onToggle={handleToggleTask} 
         onDelete={handleDeleteTask}
       />

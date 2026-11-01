@@ -38,7 +38,7 @@ export function TaskItem({ task, onToggle, onDelete}: TaskItemProps) {
 
         <div className="d-flex justify-content-between align-items-center border-top pt-2 mt-2">
           <small className={`fw-bold ${task.completed ? 'text-success' : 'text-warning'}`}>
-            {task.completed ? 'Complete!' : 'In process...'}
+            {task.completed ? 'Complete!' : 'Active...'}
           </small>
 
           <div className="d-flex gap-2">

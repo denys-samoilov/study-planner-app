@@ -10,6 +10,7 @@ import { TaskStats } from './components/TaskStats';
 export function App() {
   const [tasks, setTasks] = useState(initialTasks);
   const [filter, setFilter] = useState<FilterType>('all'); 
+  const [search, setSearch] = useState<string>('');
 
   function handleAddTask(newTask: Task): void {
     setTasks((prevTasks) => [newTask, ...prevTasks]);
@@ -39,15 +40,25 @@ export function App() {
     setTasks((prevTasks) => prevTasks.filter((task) => task.id !== id));
   }
 
-  function filteredTasks(): Task[] {
+  function filterTasks(): Task[] {
+    let filteredTasks = tasks;
     switch (filter) {
       case 'completed':
-        return tasks.filter((task) => task.completed);
+        filteredTasks = tasks.filter((task) => task.completed);
+        break;
       case 'active':
-        return tasks.filter((task) => !task.completed);
+        filteredTasks = tasks.filter((task) => !task.completed);
+        break;
       default:
-        return tasks;
+        filteredTasks = tasks;
     }
+
+    if (search.trim() !== '') {
+      filteredTasks = filteredTasks.filter((task) =>
+        task.title.toLowerCase().includes(search.toLowerCase())
+      );
+    }
+    return filteredTasks;
   }
 
   return (
@@ -60,11 +71,13 @@ export function App() {
 
       <TaskFilters 
       currentFilter={filter}
+      currentSearch={search}
       changeFilter={setFilter}
+      changeSearch={setSearch}
       />
 
       <TaskList 
-        tasks={filteredTasks()} 
+        tasks={filterTasks()} 
         currentFilter={filter}
         onToggle={handleToggleTask} 
         onDelete={handleDeleteTask}

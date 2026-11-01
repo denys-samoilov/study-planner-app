@@ -5,6 +5,7 @@ import { TaskList } from './components/TaskList';
 import { TaskForm } from './components/TaskForm';
 import { initialTasks } from './data/initialTasks';
 import { TaskFilters, type FilterType } from './components/TaskFilters';
+import { TaskStats } from './components/TaskStats';
 
 export function App() {
   const [tasks, setTasks] = useState(initialTasks);
@@ -53,7 +54,10 @@ export function App() {
     <div className="container py-5" style={{ maxWidth: '700px' }}>
       <Header />
 
-      <TaskForm onAddTask={handleAddTask} />
+      <TaskForm onAddTask={handleAddTask}></TaskForm>
+
+      <TaskStats tasks={tasks}></TaskStats>
+
       <TaskFilters 
       currentFilter={filter}
       changeFilter={setFilter}

@@ -8,9 +8,10 @@ interface TaskListProps {
   
   onToggle: (id: number | string) => void;
   onDelete: (id: number | string) => void;
+  onEdit: (taskToEdit: Task) => void;
 }
 
-export function TaskList({ tasks, currentFilter, onToggle, onDelete}: TaskListProps) {
+export function TaskList({ tasks, currentFilter, onToggle, onDelete, onEdit}: TaskListProps) {
   if (tasks.length === 0 && currentFilter === 'all') {
     return (
       <div className="alert alert-secondary text-center" role="alert">
@@ -35,6 +36,7 @@ export function TaskList({ tasks, currentFilter, onToggle, onDelete}: TaskListPr
           task={task}
           onToggle={onToggle}
           onDelete={onDelete}
+          onEdit={onEdit}
         />
       ))}
     </div>

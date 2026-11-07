@@ -19,7 +19,9 @@ export function TaskForm({ onAddTask, onEditTask, taskToEdit }: TaskFormProps) {
       setDescription(taskToEdit.description);
       setPriority(taskToEdit.priority);
       setCategory(taskToEdit.category);
-    } else {
+    } 
+    
+    else {
       setTitle('');
       setDescription('');
       setPriority('medium');
@@ -65,7 +67,7 @@ export function TaskForm({ onAddTask, onEditTask, taskToEdit }: TaskFormProps) {
   return (
     <div className="card shadow-sm mb-4">
       <div className="card-body">
-        <h4 className="card-title mb-3">Add New Task</h4>
+        <h4 className="card-title mb-3">{taskToEdit === undefined ? "Add Task Form" : ""}</h4>
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
             <label className="form-label">Title</label>
@@ -116,7 +118,7 @@ export function TaskForm({ onAddTask, onEditTask, taskToEdit }: TaskFormProps) {
           </div>
 
           <button type="submit" className="btn btn-primary w-100">
-            Create Task
+            {taskToEdit === undefined ? "Create Task" : "Update Task"}
           </button>
         </form>
       </div>

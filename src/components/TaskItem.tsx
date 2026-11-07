@@ -4,10 +4,11 @@ interface TaskItemProps {
   task: Task;
   onToggle: (id: number | string) => void;
   onDelete: (id: number | string) => void;
+  onEdit: (taskToEdit: Task) => void
 
 }
 
-export function TaskItem({ task, onToggle, onDelete}: TaskItemProps) {
+export function TaskItem({ task, onToggle, onDelete, onEdit}: TaskItemProps) {
   const getPriorityBadgeClass = (priority: string): string => {
     switch (priority) {
       case 'high': return 'bg-danger';
@@ -55,9 +56,16 @@ export function TaskItem({ task, onToggle, onDelete}: TaskItemProps) {
             >
               Delete Task
             </button>
+            <button 
+              onClick={() => onEdit(task)}
+              className={`btn btn-sm btn-outline-primary`}
+            >
+              Edit Task
+            </button>
           </div>
         </div>
       </div>
     </div>
   );
 }
+          

@@ -78,16 +78,14 @@ export function App() {
         currentFilter={filter}
         onToggle={handleToggleTask} 
         onDelete={handleDeleteTask}
-        onEdit={(task) => setEditingTask(task)}
+        onEdit={(task1) => setEditingTask(task1)}
       />
 
       <TaskEditModal 
         isOpen={editingTask !== null}
         taskToEdit={editingTask}
         onClose={() => setEditingTask(null)}
-        onEditTask={(updatedTask) => {
-          dispatch({ type: 'update', payload: updatedTask });
-        }}
+        onEditTask={handleEditTask}
       />
     </div>
   );

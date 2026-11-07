@@ -6,12 +6,14 @@ import { TaskForm } from './components/TaskForm';
 import { initialTasks } from './data/initialTasks';
 import { TaskFilters, type FilterType } from './components/TaskFilters';
 import { TaskStats } from './components/TaskStats';
+import { TaskEditModal } from './components/TaskEditModal';
 import { taskReducer } from './reducers/taskReducer'; 
 
 export function App() {
   const [tasks, dispatch] = useReducer(taskReducer, initialTasks);
   const [filter, setFilter] = useState<FilterType>('all'); 
   const [search, setSearch] = useState<string>('');
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
 
   function handleAddTask(newTask: Task): void {
     dispatch({ type: 'add', payload: newTask });
@@ -19,6 +21,10 @@ export function App() {
 
   function handleToggleTask(id: number | string): void {
     dispatch({ type: 'toggle', payload: id });
+  }
+
+  function handleEditTask(updatedTask: Task): void {
+    dispatch({ type: 'update', payload: updatedTask });
   }
   
   function handleDeleteTask(id: number | string): void {
@@ -53,7 +59,10 @@ export function App() {
     <div className="container py-5" style={{ maxWidth: '700px' }}>
       <Header />
 
-      <TaskForm onAddTask={handleAddTask}></TaskForm>
+      <TaskForm 
+      onAddTask={handleAddTask}
+      onEditTask={handleEditTask}
+      />
 
       <TaskStats tasks={tasks}></TaskStats>
 
@@ -69,6 +78,16 @@ export function App() {
         currentFilter={filter}
         onToggle={handleToggleTask} 
         onDelete={handleDeleteTask}
+        onEdit={(task) => setEditingTask(task)}
+      />
+
+      <TaskEditModal 
+        isOpen={editingTask !== null}
+        taskToEdit={editingTask}
+        onClose={() => setEditingTask(null)}
+        onEditTask={(updatedTask) => {
+          dispatch({ type: 'update', payload: updatedTask });
+        }}
       />
     </div>
   );

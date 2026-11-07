@@ -1,5 +1,5 @@
 import { Task } from '../types/task';
-import { initialTasks } from '../data/initialTasks'; // <-- Додати цей імпорт
+import { initialTasks } from '../data/initialTasks';
 
 export type TaskAction = 
   | { type: 'add'; payload: Task }

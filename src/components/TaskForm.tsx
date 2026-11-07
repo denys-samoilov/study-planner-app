@@ -1,34 +1,60 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Task, type Priority } from '../types/task';
 
-class TaskFormProps {
+interface TaskFormProps {
   onAddTask: (task: Task) => void;
-
-  constructor(onAddTask: (task: Task) => void){
-    this.onAddTask = onAddTask;
-  }
+  onEditTask: (task: Task) => void;
+  taskToEdit?: Task | null;         
 }
 
-export function TaskForm({ onAddTask }: TaskFormProps) {
+export function TaskForm({ onAddTask, onEditTask, taskToEdit }: TaskFormProps) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [priority, setPriority] = useState<Priority>('medium');
   const [category, setCategory] = useState('');
 
+  useEffect(() => {
+    if (taskToEdit) {
+      setTitle(taskToEdit.title);
+      setDescription(taskToEdit.description);
+      setPriority(taskToEdit.priority);
+      setCategory(taskToEdit.category);
+    } else {
+      setTitle('');
+      setDescription('');
+      setPriority('medium');
+      setCategory('');
+    }
+  }, [taskToEdit]);
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!title) return;
 
-    const newTask = new Task(
-      Date.now(),
+    if(taskToEdit){
+      const editedTask = new Task(
+      taskToEdit.id,
       title,
       description,
-      false, 
+      taskToEdit.completed, 
       priority,
       category
-    );
+      );
+      onEditTask(editedTask);
+    }
 
-    onAddTask(newTask);
+    else{
+      const newTask = new Task(
+        Date.now(),
+        title,
+        description,
+        false, 
+        priority,
+        category
+      );
+      onAddTask(newTask);
+    }
+    
 
     setTitle('');
     setDescription('');

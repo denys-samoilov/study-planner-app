@@ -1,38 +1,26 @@
-import { useReducer, useState } from 'react';
-import { Header } from './components/Header';
 import { Task } from './types/task';
+import { Header } from './components/Header';
 import { TaskList } from './components/TaskList';
 import { TaskForm } from './components/TaskForm';
-import { initialTasks } from './data/initialTasks';
-import { TaskFilters, type FilterType } from './components/TaskFilters';
+import { TaskFilters } from './components/TaskFilters';
 import { TaskStats } from './components/TaskStats';
 import { TaskEditModal } from './components/TaskEditModal';
-import { taskReducer } from './reducers/taskReducer'; 
+import { TaskProvider, useTasks } from './context/TaskContext';
 
-export function App() {
-  const [tasks, dispatch] = useReducer(taskReducer, initialTasks);
-  const [filter, setFilter] = useState<FilterType>('all'); 
-  const [search, setSearch] = useState<string>('');
-  const [editingTask, setEditingTask] = useState<Task | null>(null);
-
-  function handleAddTask(newTask: Task): void {
-    dispatch({ type: 'add', payload: newTask });
-  }
-
-  function handleToggleTask(id: number | string): void {
-    dispatch({ type: 'toggle', payload: id });
-  }
-
-  function handleEditTask(updatedTask: Task): void {
-    dispatch({ type: 'update', payload: updatedTask });
-  }
-  
-  function handleDeleteTask(id: number | string): void {
-    dispatch({ type: 'confirmDelete', payload: id})
-  }
-
-
-  
+function MainContent() {
+  const { 
+    tasks, 
+    filter, 
+    search, 
+    editingTask, 
+    setFilter, 
+    setSearch, 
+    setEditingTask, 
+    addTask, 
+    updateTask, 
+    toggleTask, 
+    requestDelete 
+  } = useTasks();
 
   function filterTasks(): Task[] {
     let filteredTasks = tasks;
@@ -60,34 +48,42 @@ export function App() {
       <Header />
 
       <TaskForm 
-      onAddTask={handleAddTask}
-      onEditTask={handleEditTask}
+        onAddTask={addTask}
+        onEditTask={updateTask}
       />
 
-      <TaskStats tasks={tasks}></TaskStats>
+      <TaskStats tasks={tasks} />
 
       <TaskFilters 
-      currentFilter={filter}
-      currentSearch={search}
-      changeFilter={setFilter}
-      changeSearch={setSearch}
+        currentFilter={filter}
+        currentSearch={search}
+        changeFilter={setFilter}
+        changeSearch={setSearch}
       />
 
       <TaskList 
         tasks={filterTasks()} 
         currentFilter={filter}
-        onToggle={handleToggleTask} 
-        onDelete={handleDeleteTask}
-        onEdit={(task1) => setEditingTask(task1)}
+        onToggle={toggleTask} 
+        onDelete={requestDelete}
+        onEdit={(task) => setEditingTask(task)}
       />
 
       <TaskEditModal 
         isOpen={editingTask !== null}
         taskToEdit={editingTask}
         onClose={() => setEditingTask(null)}
-        onEditTask={handleEditTask}
+        onEditTask={updateTask}
       />
     </div>
+  );
+}
+
+export function App() {
+  return (
+    <TaskProvider>
+      <MainContent />
+    </TaskProvider>
   );
 }
 

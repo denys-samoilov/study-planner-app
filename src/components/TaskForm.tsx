@@ -67,7 +67,8 @@ export function TaskForm({ onAddTask, onEditTask, taskToEdit }: TaskFormProps) {
   return (
     <div className="card shadow-sm mb-4">
       <div className="card-body">
-        <h4 className="card-title mb-3">{taskToEdit === undefined ? "Add Task Form" : ""}</h4>
+        {taskToEdit === undefined ? <h4 className="card-title mb-3">Add Task Form</h4> : ""}
+        
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
             <label className="form-label">Title</label>

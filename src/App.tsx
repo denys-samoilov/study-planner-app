@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useReducer, useState } from 'react';
 import { Header } from './components/Header';
 import { Task } from './types/task';
 import { TaskList } from './components/TaskList';
@@ -6,39 +6,27 @@ import { TaskForm } from './components/TaskForm';
 import { initialTasks } from './data/initialTasks';
 import { TaskFilters, type FilterType } from './components/TaskFilters';
 import { TaskStats } from './components/TaskStats';
+import { taskReducer } from './reducers/taskReducer'; 
 
 export function App() {
-  const [tasks, setTasks] = useState(initialTasks);
+  const [tasks, dispatch] = useReducer(taskReducer, initialTasks);
   const [filter, setFilter] = useState<FilterType>('all'); 
   const [search, setSearch] = useState<string>('');
 
   function handleAddTask(newTask: Task): void {
-    setTasks((prevTasks) => [newTask, ...prevTasks]);
+    dispatch({ type: 'add', payload: newTask });
   }
 
   function handleToggleTask(id: number | string): void {
-  setTasks((prevTasks) =>
-    prevTasks.map((task) => {
-      if (task.id === id) {
-        return new Task(
-          task.id,
-          task.title,
-          task.description,
-          !task.completed,
-          task.priority,
-          task.category
-        );
-      } 
-      else {
-        return task;
-      }
-    })
-  );
-}
+    dispatch({ type: 'toggle', payload: id });
+  }
   
   function handleDeleteTask(id: number | string): void {
-    setTasks((prevTasks) => prevTasks.filter((task) => task.id !== id));
+    dispatch({ type: 'confirmDelete', payload: id})
   }
+
+
+  
 
   function filterTasks(): Task[] {
     let filteredTasks = tasks;

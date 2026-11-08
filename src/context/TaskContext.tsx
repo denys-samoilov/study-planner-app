@@ -1,9 +1,10 @@
-import React, { createContext, useContext, useReducer, useState, useEffect } from 'react';
+import React, { createContext, useReducer, useState, useEffect } from 'react';
 import { Task } from '../types/task';
 import { initialTasks } from '../data/initialTasks';
 import { taskReducer } from '../reducers/taskReducer';
 import { type FilterType } from '../components/TaskFilters';
 import { useLocalStorage } from '../hooks/useLocalStorage';
+import type { ToastType } from '../components/Toast';
 
 const tasksKey = 'study_planner_tasks';
 
@@ -20,14 +21,21 @@ function loadInitialTasks(): Task[] {
   }
 }
 
+interface ToastState {
+  message: string;
+  type: ToastType;
+}
+
 interface TaskContextType {
   tasks: Task[];
   filter: FilterType;
   search: string;
   editingTask: Task | null;
+  toast: ToastState | null;
   setFilter: (filter: FilterType) => void;
   setSearch: (search: string) => void;
   setEditingTask: (task: Task | null) => void;
+  hideToast: () => void;
   addTask: (task: Task) => void;
   updateTask: (task: Task) => void;
   toggleTask: (id: number | string) => void;
@@ -45,25 +53,43 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   const [search, setSearch] = useLocalStorage<string>('study_planner_search', '');
   const [editingTask, setEditingTask] = useState<Task | null>(null);
 
+  const [toast, setToast] = useState<ToastState | null>(null);
+
+  const showToast = (message: string, type: ToastType = 'success') => {
+    setToast({ message, type });
+  }
+
+  const hideToast = () => {
+    setToast(null);
+  }
+
   useEffect(() => {
       window.localStorage.setItem(tasksKey, JSON.stringify(tasks));
 
       const amountOfActiveTasks = tasks.filter(task => !task.completed).length;
 
-      document.title = "Study Planner - " + amountOfActiveTasks + " active task" + (amountOfActiveTasks !== 1 ? "s" : "");
+      if (amountOfActiveTasks > 0) {
+        document.title = "Study Planner - " + amountOfActiveTasks + " active task" + (amountOfActiveTasks !== 1 ? "s" : "");
+      }
+
+      else document.title = "Study Planner";
+
   }, [tasks]);
 
   const addTask = (newTask: Task) => {
     dispatch({ type: 'add', payload: newTask });
+    showToast('Task created successfully!', 'success');
   };
 
   const updateTask = (updatedTask: Task) => {
     dispatch({ type: 'update', payload: updatedTask });
     setEditingTask(null);
+    showToast('Task updated successfully!', 'success');
   };
 
   const toggleTask = (id: number | string) => {
     dispatch({ type: 'toggle', payload: id });
+    showToast('Task toggled', 'info');
   };
 
   const requestDelete = (id: number | string) => {
@@ -91,9 +117,11 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
         filter,
         search,
         editingTask,
+        toast,
         setFilter,
         setSearch,
         setEditingTask,
+        hideToast,
         addTask,
         updateTask,
         toggleTask,

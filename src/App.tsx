@@ -7,6 +7,7 @@ import { TaskStats } from './components/TaskStats';
 import { TaskEditModal } from './components/TaskEditModal';
 import { TaskProvider } from './context/TaskContext';
 import { useTaskContext } from './hooks/useTaskContext';
+import { Toast } from './components/Toast';
 
 function MainContent() {
   const { 
@@ -14,9 +15,11 @@ function MainContent() {
     filter, 
     search, 
     editingTask, 
+    toast,
     setFilter, 
     setSearch, 
     setEditingTask, 
+    hideToast,
     addTask, 
     updateTask, 
     toggleTask, 
@@ -75,6 +78,14 @@ function MainContent() {
         taskToEdit={editingTask}
         onClose={() => setEditingTask(null)}
         onEditTask={updateTask}
+      />
+
+      <Toast
+        isOpen={toast !== null}
+        message={toast?.message || ''}
+        type={toast?.type}
+        onClose={hideToast}
+        duration={1000}
       />
     </div>
   );

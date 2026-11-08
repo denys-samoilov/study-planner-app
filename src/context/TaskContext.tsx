@@ -1,9 +1,24 @@
-import React, { createContext, useContext, useReducer, useState } from 'react';
+import React, { createContext, useContext, useReducer, useState, useEffect } from 'react';
 import { Task } from '../types/task';
 import { initialTasks } from '../data/initialTasks';
 import { taskReducer } from '../reducers/taskReducer';
 import { type FilterType } from '../components/TaskFilters';
 import { useLocalStorage } from '../hooks/useLocalStorage';
+
+const tasksKey = 'study_planner_tasks';
+
+function loadInitialTasks(): Task[] {
+  try {
+    const saved = window.localStorage.getItem(tasksKey);
+    if (!saved) return initialTasks;
+    const parsed = JSON.parse(saved);
+    return Array.isArray(parsed) ? parsed : initialTasks;
+  }
+  catch (error) {
+    console.error('Error loading tasks from localStorage:', error);
+    return initialTasks;
+  }
+}
 
 interface TaskContextType {
   tasks: Task[];
@@ -25,10 +40,14 @@ interface TaskContextType {
 export const TaskContext = createContext<TaskContextType | undefined>(undefined);
 
 export function TaskProvider({ children }: { children: React.ReactNode }) {
-  const [tasks, dispatch] = useReducer(taskReducer, initialTasks);
+  const [tasks, dispatch] = useReducer(taskReducer, loadInitialTasks());
   const [filter, setFilter] = useLocalStorage<FilterType>('study_planner_filter', 'all');
   const [search, setSearch] = useLocalStorage<string>('study_planner_search', '');
   const [editingTask, setEditingTask] = useState<Task | null>(null);
+
+  useEffect(() => {
+      window.localStorage.setItem(tasksKey, JSON.stringify(tasks));
+  }, [tasks]);
 
   const addTask = (newTask: Task) => {
     dispatch({ type: 'add', payload: newTask });

@@ -5,7 +5,8 @@ import { TaskForm } from './components/TaskForm';
 import { TaskFilters } from './components/TaskFilters';
 import { TaskStats } from './components/TaskStats';
 import { TaskEditModal } from './components/TaskEditModal';
-import { TaskProvider, useTasks } from './context/TaskContext';
+import { TaskProvider } from './context/TaskContext';
+import { useTaskContext } from './hooks/useTaskContext';
 
 function MainContent() {
   const { 
@@ -20,7 +21,7 @@ function MainContent() {
     updateTask, 
     toggleTask, 
     requestDelete 
-  } = useTasks();
+  } = useTaskContext();
 
   function filterTasks(): Task[] {
     let filteredTasks = tasks;

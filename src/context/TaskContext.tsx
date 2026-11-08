@@ -3,6 +3,7 @@ import { Task } from '../types/task';
 import { initialTasks } from '../data/initialTasks';
 import { taskReducer } from '../reducers/taskReducer';
 import { type FilterType } from '../components/TaskFilters';
+import { useLocalStorage } from '../hooks/useLocalStorage';
 
 interface TaskContextType {
   tasks: Task[];
@@ -21,12 +22,12 @@ interface TaskContextType {
   resetTasks: () => void;
 }
 
-const TaskContext = createContext<TaskContextType | undefined>(undefined);
+export const TaskContext = createContext<TaskContextType | undefined>(undefined);
 
 export function TaskProvider({ children }: { children: React.ReactNode }) {
   const [tasks, dispatch] = useReducer(taskReducer, initialTasks);
-  const [filter, setFilter] = useState<FilterType>('all');
-  const [search, setSearch] = useState<string>('');
+  const [filter, setFilter] = useLocalStorage<FilterType>('study_planner_filter', 'all');
+  const [search, setSearch] = useLocalStorage<string>('study_planner_search', '');
   const [editingTask, setEditingTask] = useState<Task | null>(null);
 
   const addTask = (newTask: Task) => {
@@ -82,12 +83,4 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
       {children}
     </TaskContext.Provider>
   );
-}
-
-export function useTasks() {
-  const context = useContext(TaskContext);
-  if (!context) {
-    throw new Error('useTasks must be used within a TaskProvider');
-  }
-  return context;
 }

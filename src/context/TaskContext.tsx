@@ -38,6 +38,7 @@ interface TaskContextType {
   setFilter: (filter: FilterType) => void;
   setSearch: (search: string) => void;
   setEditingTask: (task: Task | null) => void;
+  filterTasks: () => Task[];
   hideToast: () => void;
   addTask: (task: Task) => void;
   updateTask: (task: Task) => void;
@@ -90,6 +91,27 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
       }
       else document.title = "Study Planner";
   }, [tasks]);
+
+  const filterTasks = (): Task[] => {
+        let filteredTasks = tasks;
+        switch (filter) {
+          case 'completed':
+            filteredTasks = tasks.filter((task) => task.completed);
+            break;
+          case 'active':
+            filteredTasks = tasks.filter((task) => !task.completed);
+            break;
+          default:
+            filteredTasks = tasks;
+        }
+    
+        if (search.trim() !== '') {
+          filteredTasks = filteredTasks.filter((task) =>
+            task.title.toLowerCase().includes(search.toLowerCase())
+          );
+        }
+        return filteredTasks;
+    };
 
   const addTask = (newTask: Task) => {
     dispatch({ type: 'add', payload: newTask });
@@ -150,6 +172,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
         setFilter,
         setSearch,
         setEditingTask,
+        filterTasks,
         hideToast,
         addTask,
         updateTask,

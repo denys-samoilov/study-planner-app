@@ -1,4 +1,3 @@
-import { Task } from './types/task';
 import { Header } from './components/Header';
 import { TaskList } from './components/TaskList';
 import { TaskForm } from './components/TaskForm';
@@ -17,29 +16,11 @@ function MainContent() {
     editingTask, 
     deletingTask,
     toast, 
+    filterTasks,
     undoDelete
   } = useTaskContext();
 
-  function filterTasks(): Task[] {
-    let filteredTasks = tasks;
-    switch (filter) {
-      case 'completed':
-        filteredTasks = tasks.filter((task) => task.completed);
-        break;
-      case 'active':
-        filteredTasks = tasks.filter((task) => !task.completed);
-        break;
-      default:
-        filteredTasks = tasks;
-    }
-
-    if (search.trim() !== '') {
-      filteredTasks = filteredTasks.filter((task) =>
-        task.title.toLowerCase().includes(search.toLowerCase())
-      );
-    }
-    return filteredTasks;
-  }
+  
 
   return (
     <div className="container py-5" style={{ maxWidth: '700px' }}>

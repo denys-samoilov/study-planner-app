@@ -58,10 +58,10 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   
   const [toast, setToast] = useState<ToastState | null>(null);
 
-  const [deletingTask, setDeletingTask] = useState<Task | undefined>(tasks.find(task => task.isDeleting));
+  const deletingTask = tasks.find(task => task.isDeleting);  
   const deletingTaskId = deletingTask?.id;
 
-  const showToast = (message: string, type: ToastType = 'success', onUndo?: () => void, duration = 5000) => {
+  const showToast = (message: string, type: ToastType = 'success', onUndo?: () => void, duration = 3000) => {
     setToast({ message, type, onUndo, duration });
   }
 
@@ -74,8 +74,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
 
     const timer = setTimeout(() => {
       dispatch({ type: 'confirmDelete', payload: deletingTaskId });
-      setDeletingTask(undefined);
-      showToast('Task deleted permanently', 'error', undefined, 3000);
+      showToast('Task deleted permanently', 'error');
     }, 5000);
 
     return () => clearTimeout(timer);
@@ -113,7 +112,6 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
     if (!taskToDelete) return;
 
     dispatch({ type: 'requestDelete', payload: id });
-    setDeletingTask(taskToDelete);
     showToast(
       `Task "${taskToDelete.title}" will be deleted in 5 seconds`,
       'error',
@@ -125,7 +123,6 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   const undoDelete = (_id?: number | string) => {
     if (deletingTask) {
       dispatch({ type: 'undoDelete', payload: deletingTask.id });
-      setDeletingTask(undefined);
       hideToast();
       showToast('Deletion cancelled', 'info');
     }

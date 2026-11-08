@@ -1,17 +1,15 @@
 import { Task } from '../types/task';
+import { useTaskContext } from '../hooks/useTaskContext';
 
 interface TaskItemProps {
   task: Task;
-  isDeleting?: boolean | null;
-
-  onToggle: (id: number | string) => void;
-  onDelete: (id: number | string) => void;
-  onEdit: (taskToEdit: Task) => void
-  onUndo: (id: number | string) => void;
-
 }
 
-export function TaskItem({ task, isDeleting, onToggle, onDelete, onEdit, onUndo}: TaskItemProps) {
+export function TaskItem({ task }: TaskItemProps) {
+  const { toggleTask, requestDelete, undoDelete, setEditingTask } = useTaskContext();
+
+  const isDeleting = task.isDeleting;
+
   const getPriorityBadgeClass = (priority: string): string => {
     switch (priority) {
       case 'high': return 'bg-danger';
@@ -48,34 +46,31 @@ export function TaskItem({ task, isDeleting, onToggle, onDelete, onEdit, onUndo}
           <div className="d-flex gap-2">
             {!isDeleting && (
               <button 
-              onClick={() => onToggle(task.id)}
-              className={`btn btn-sm ${ task.completed ? 'btn-outline-warning' : 'btn-outline-success'}`}
-            >
-              {task.completed ? 'Return' : 'Finish'}
-            </button>
-          )}
-            
+                onClick={() => toggleTask(task.id)}
+                className={`btn btn-sm ${task.completed ? 'btn-outline-warning' : 'btn-outline-success'}`}
+              >
+                {task.completed ? 'Return' : 'Finish'}
+              </button>
+            )}
 
             <button 
-              onClick={isDeleting ? () => onUndo(task.id) : () => onDelete(task.id)}
-              className={`btn btn-sm btn-danger`}
+              onClick={isDeleting ? () => undoDelete(task.id) : () => requestDelete(task.id)}
+              className="btn btn-sm btn-danger"
             >
               {isDeleting ? "Undo" : "Delete Task"}
             </button>
 
             {!isDeleting && (
-            <button 
-              onClick={() => onEdit(task)}
-              className={`btn btn-sm btn-outline-primary`}
-            >
-              Edit Task
-            </button>
-          )}
-            
+              <button 
+                onClick={() => setEditingTask(task)}
+                className="btn btn-sm btn-outline-primary"
+              >
+                Edit Task
+              </button>
+            )}
           </div>
         </div>
       </div>
     </div>
   );
 }
-          

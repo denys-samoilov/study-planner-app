@@ -1,14 +1,11 @@
-import { Task } from '../types/task';
 import { TaskForm } from './TaskForm';
 
 interface TaskEditModalProps {
   isOpen: boolean;                
-  taskToEdit: Task | null;        
   onClose: () => void;           
-  onEditTask: (task: Task) => void;
 }
 
-export function TaskEditModal({ isOpen, taskToEdit, onClose, onEditTask }: TaskEditModalProps) {
+export function TaskEditModal({ isOpen, onClose }: TaskEditModalProps) {
   if (!isOpen) return null; 
 
   return (
@@ -21,12 +18,6 @@ export function TaskEditModal({ isOpen, taskToEdit, onClose, onEditTask }: TaskE
           </div>
           <div className="modal-body">
             <TaskForm 
-              onAddTask={() => {}} 
-              onEditTask={(updatedTask) => {
-                onEditTask(updatedTask);
-                onClose();
-              }}
-              taskToEdit={taskToEdit}
             />
           </div>
         </div>

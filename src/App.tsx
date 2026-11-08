@@ -21,10 +21,6 @@ function MainContent() {
     setSearch, 
     setEditingTask, 
     hideToast,
-    addTask, 
-    updateTask, 
-    toggleTask, 
-    requestDelete,
     undoDelete
   } = useTaskContext();
 
@@ -54,8 +50,7 @@ function MainContent() {
       <Header />
 
       <TaskForm 
-        onAddTask={addTask}
-        onEditTask={updateTask}
+       
       />
 
       <TaskStats tasks={tasks} />
@@ -70,18 +65,11 @@ function MainContent() {
       <TaskList 
         tasks={filterTasks()} 
         currentFilter={filter}
-        onToggle={toggleTask} 
-        onDelete={requestDelete}
-        onEdit={(task) => setEditingTask(task)}
-        isDeleting={(task) => deletingTask?.id === task.id}
-        onUndo={undoDelete}
       />
 
       <TaskEditModal 
         isOpen={editingTask !== null}
-        taskToEdit={editingTask}
         onClose={() => setEditingTask(null)}
-        onEditTask={updateTask}
       />
 
       <Toast

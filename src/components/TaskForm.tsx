@@ -1,24 +1,21 @@
 import { useState, useEffect } from 'react';
 import { Task, type Priority } from '../types/task';
+import { useTaskContext } from '../hooks/useTaskContext';
 
-interface TaskFormProps {
-  onAddTask: (task: Task) => void;
-  onEditTask: (task: Task) => void;
-  taskToEdit?: Task | null;         
-}
 
-export function TaskForm({ onAddTask, onEditTask, taskToEdit }: TaskFormProps) {
+export function TaskForm() {
+  const { addTask, updateTask, editingTask } = useTaskContext();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [priority, setPriority] = useState<Priority>('medium');
   const [category, setCategory] = useState('');
 
   useEffect(() => {
-    if (taskToEdit) {
-      setTitle(taskToEdit.title);
-      setDescription(taskToEdit.description);
-      setPriority(taskToEdit.priority);
-      setCategory(taskToEdit.category);
+    if (editingTask) {
+      setTitle(editingTask.title);
+      setDescription(editingTask.description);
+      setPriority(editingTask.priority);
+      setCategory(editingTask.category);
     } 
     
     else {
@@ -27,22 +24,22 @@ export function TaskForm({ onAddTask, onEditTask, taskToEdit }: TaskFormProps) {
       setPriority('medium');
       setCategory('');
     }
-  }, [taskToEdit]);
+  }, [editingTask]);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!title) return;
 
-    if(taskToEdit){
+    if(editingTask){
       const editedTask = new Task(
-      taskToEdit.id,
+      editingTask.id,
       title,
       description,
-      taskToEdit.completed, 
+      editingTask.completed, 
       priority,
       category
       );
-      onEditTask(editedTask);
+      updateTask(editedTask);
     }
 
     else{
@@ -54,7 +51,7 @@ export function TaskForm({ onAddTask, onEditTask, taskToEdit }: TaskFormProps) {
         priority,
         category
       );
-      onAddTask(newTask);
+      addTask(newTask);
     }
     
 
@@ -67,7 +64,7 @@ export function TaskForm({ onAddTask, onEditTask, taskToEdit }: TaskFormProps) {
   return (
     <div className="card shadow-sm mb-4">
       <div className="card-body">
-        {taskToEdit === undefined ? <h4 className="card-title mb-3">Add Task Form</h4> : ""}
+        {addTask === undefined ? <h4 className="card-title mb-3">Add Task Form</h4> : ""}
         
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
@@ -119,7 +116,7 @@ export function TaskForm({ onAddTask, onEditTask, taskToEdit }: TaskFormProps) {
           </div>
 
           <button type="submit" className="btn btn-primary w-100">
-            {taskToEdit === undefined ? "Create Task" : "Update Task"}
+            {addTask === undefined ? "Create Task" : "Update Task"}
           </button>
         </form>
       </div>

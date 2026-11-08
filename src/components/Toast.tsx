@@ -16,12 +16,13 @@ export function Toast({ isOpen, message, type = 'success', duration = 3000, onUn
   const {hideToast} = useTaskContext();
   
   useEffect(() => {
-      const timer = setTimeout(() => {
-        hideToast();
-      }, duration);
+    if (!isOpen) return;
+    const timer = setTimeout(() => {
+      hideToast();
+    }, duration);
 
-      return () => clearTimeout(timer);
-    }, [hideToast, duration]);
+    return () => clearTimeout(timer);
+    }, [isOpen, duration]);
 
     
     if (!isOpen) return null;

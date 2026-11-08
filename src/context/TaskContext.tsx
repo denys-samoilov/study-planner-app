@@ -59,7 +59,6 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   const [toast, setToast] = useState<ToastState | null>(null);
 
   const deletingTask = tasks.find(task => task.isDeleting);  
-  const deletingTaskId = deletingTask?.id;
 
   const showToast = (message: string, type: ToastType = 'success', onUndo?: () => void, duration = 3000) => {
     setToast({ message, type, onUndo, duration });
@@ -70,6 +69,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   }
 
   useEffect(() => {
+    const deletingTaskId = deletingTask?.id;
     if (deletingTaskId === undefined) return;
 
     const timer = setTimeout(() => {
@@ -78,7 +78,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
     }, 5000);
 
     return () => clearTimeout(timer);
-  }, [deletingTaskId]);
+  }, [deletingTask]);
 
   useEffect(() => {
       window.localStorage.setItem(tasksKey, JSON.stringify(tasks));

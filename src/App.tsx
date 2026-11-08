@@ -16,11 +16,7 @@ function MainContent() {
     search, 
     editingTask, 
     deletingTask,
-    toast,
-    setFilter, 
-    setSearch, 
-    setEditingTask, 
-    hideToast,
+    toast, 
     undoDelete
   } = useTaskContext();
 
@@ -49,17 +45,13 @@ function MainContent() {
     <div className="container py-5" style={{ maxWidth: '700px' }}>
       <Header />
 
-      <TaskForm 
-       
-      />
+      <TaskForm />
 
       <TaskStats tasks={tasks} />
 
       <TaskFilters 
         currentFilter={filter}
         currentSearch={search}
-        changeFilter={setFilter}
-        changeSearch={setSearch}
       />
 
       <TaskList 
@@ -69,14 +61,12 @@ function MainContent() {
 
       <TaskEditModal 
         isOpen={editingTask !== null}
-        onClose={() => setEditingTask(null)}
       />
 
       <Toast
         isOpen={toast !== null}
         message={toast?.message || ''}
         type={toast?.type}
-        onClose={hideToast}
         duration={toast?.duration}
         onUndo={deletingTask !== undefined ? undoDelete : undefined}
       />

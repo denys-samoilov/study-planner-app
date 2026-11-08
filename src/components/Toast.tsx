@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { useTaskContext } from '../hooks/useTaskContext';
 
 export type ToastType = 'success' | 'error' | 'info';
 
@@ -6,21 +7,21 @@ interface ToastProps {
     isOpen: boolean;
     message: string;
     type?: ToastType;
-    onClose: () => void;
     duration?: number;
     onUndo?: () => void; 
 }
 
-export function Toast({ isOpen, message, type = 'success', onClose, duration = 3000, onUndo }: ToastProps) {
+export function Toast({ isOpen, message, type = 'success', duration = 3000, onUndo }: ToastProps) {
+  const {hideToast} = useTaskContext();
     if (!isOpen) return null;
 
     useEffect(() => {
       const timer = setTimeout(() => {
-        onClose();
+        hideToast();
       }, duration);
 
       return () => clearTimeout(timer);
-    }, [onClose, duration]);
+    }, [hideToast, duration]);
 
     const bgClasses = {
       success: 'bg-success text-white',
@@ -46,7 +47,7 @@ export function Toast({ isOpen, message, type = 'success', onClose, duration = 3
               className="btn btn-sm btn-light text-dark fw-bold ms-2 px-2 py-1"
               onClick={() => {
                 onUndo();
-                onClose();
+                hideToast();
               }}
             >
               Undo
@@ -56,7 +57,7 @@ export function Toast({ isOpen, message, type = 'success', onClose, duration = 3
             type="button" 
             className="btn-close btn-close-white ms-3" 
             aria-label="Close" 
-            onClick={onClose}
+            onClick={hideToast}
           />
         </div>
       </div>

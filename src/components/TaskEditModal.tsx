@@ -1,11 +1,14 @@
+import { useTaskContext } from '../hooks/useTaskContext';
 import { TaskForm } from './TaskForm';
+
+
 
 interface TaskEditModalProps {
   isOpen: boolean;                
-  onClose: () => void;           
 }
 
-export function TaskEditModal({ isOpen, onClose }: TaskEditModalProps) {
+export function TaskEditModal({ isOpen }: TaskEditModalProps) {
+  const {setEditingTask} = useTaskContext();
   if (!isOpen) return null; 
 
   return (
@@ -14,7 +17,7 @@ export function TaskEditModal({ isOpen, onClose }: TaskEditModalProps) {
         <div className="modal-content">
           <div className="modal-header">
             <h5 className="modal-title">Edit Task</h5>
-            <button type="button" className="btn-close" onClick={onClose}></button>
+            <button type="button" className="btn-close" onClick={() => setEditingTask(null)}></button>
           </div>
           <div className="modal-body">
             <TaskForm 

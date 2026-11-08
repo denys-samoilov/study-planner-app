@@ -47,6 +47,10 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
       window.localStorage.setItem(tasksKey, JSON.stringify(tasks));
+
+      const amountOfActiveTasks = tasks.filter(task => !task.completed).length;
+
+      document.title = "Study Planner - " + amountOfActiveTasks + " active task" + (amountOfActiveTasks !== 1 ? "s" : "");
   }, [tasks]);
 
   const addTask = (newTask: Task) => {

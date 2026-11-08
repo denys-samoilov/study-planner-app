@@ -25,7 +25,8 @@ export function taskReducer(state: Task[], action: TaskAction): Task[] {
               task.description,
               !task.completed,
               task.priority,
-              task.category
+              task.category,
+              task.isDeleting
             )
           : task
       );
@@ -44,7 +45,8 @@ export function taskReducer(state: Task[], action: TaskAction): Task[] {
               task.description,
               task.completed,
               task.priority,
-              task.category
+              task.category,
+              true
             )
           : task
       );
@@ -61,7 +63,8 @@ export function taskReducer(state: Task[], action: TaskAction): Task[] {
               task.description,
               task.completed,
               task.priority,
-              task.category
+              task.category,
+              false
             )
           : task
       );

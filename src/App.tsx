@@ -15,6 +15,7 @@ function MainContent() {
     filter, 
     search, 
     editingTask, 
+    deletingTask,
     toast,
     setFilter, 
     setSearch, 
@@ -23,7 +24,8 @@ function MainContent() {
     addTask, 
     updateTask, 
     toggleTask, 
-    requestDelete 
+    requestDelete,
+    undoDelete
   } = useTaskContext();
 
   function filterTasks(): Task[] {
@@ -71,6 +73,8 @@ function MainContent() {
         onToggle={toggleTask} 
         onDelete={requestDelete}
         onEdit={(task) => setEditingTask(task)}
+        isDeleting={(task) => deletingTask?.id === task.id}
+        onUndo={undoDelete}
       />
 
       <TaskEditModal 
@@ -85,7 +89,8 @@ function MainContent() {
         message={toast?.message || ''}
         type={toast?.type}
         onClose={hideToast}
-        duration={1000}
+        duration={toast?.duration}
+        onUndo={deletingTask !== undefined ? undoDelete : undefined}
       />
     </div>
   );

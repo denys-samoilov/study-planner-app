@@ -24,6 +24,8 @@ function loadInitialTasks(): Task[] {
 interface ToastState {
   message: string;
   type: ToastType;
+  onUndo?: () => void;
+  duration?: number;
 }
 
 interface TaskContextType {
@@ -31,6 +33,7 @@ interface TaskContextType {
   filter: FilterType;
   search: string;
   editingTask: Task | null;
+  deletingTask: Task | undefined;
   toast: ToastState | null;
   setFilter: (filter: FilterType) => void;
   setSearch: (search: string) => void;
@@ -40,7 +43,7 @@ interface TaskContextType {
   updateTask: (task: Task) => void;
   toggleTask: (id: number | string) => void;
   requestDelete: (id: number | string) => void;
-  undoDelete: (id: number | string) => void;
+  undoDelete: (id?: number | string) => void; 
   clearCompleted: () => void;
   resetTasks: () => void;
 }
@@ -52,16 +55,31 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   const [filter, setFilter] = useLocalStorage<FilterType>('study_planner_filter', 'all');
   const [search, setSearch] = useLocalStorage<string>('study_planner_search', '');
   const [editingTask, setEditingTask] = useState<Task | null>(null);
-
+  
   const [toast, setToast] = useState<ToastState | null>(null);
 
-  const showToast = (message: string, type: ToastType = 'success') => {
-    setToast({ message, type });
+  const [deletingTask, setDeletingTask] = useState<Task | undefined>(tasks.find(task => task.isDeleting));
+  const deletingTaskId = deletingTask?.id;
+
+  const showToast = (message: string, type: ToastType = 'success', onUndo?: () => void, duration = 5000) => {
+    setToast({ message, type, onUndo, duration });
   }
 
   const hideToast = () => {
     setToast(null);
   }
+
+  useEffect(() => {
+    if (deletingTaskId === undefined) return;
+
+    const timer = setTimeout(() => {
+      dispatch({ type: 'confirmDelete', payload: deletingTaskId });
+      setDeletingTask(undefined);
+      showToast('Task deleted permanently', 'error', undefined, 3000);
+    }, 5000);
+
+    return () => clearTimeout(timer);
+  }, [deletingTaskId]);
 
   useEffect(() => {
       window.localStorage.setItem(tasksKey, JSON.stringify(tasks));
@@ -71,9 +89,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
       if (amountOfActiveTasks > 0) {
         document.title = "Study Planner - " + amountOfActiveTasks + " active task" + (amountOfActiveTasks !== 1 ? "s" : "");
       }
-
       else document.title = "Study Planner";
-
   }, [tasks]);
 
   const addTask = (newTask: Task) => {
@@ -93,22 +109,37 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   };
 
   const requestDelete = (id: number | string) => {
-    dispatch({ type: 'confirmDelete', payload: id }); 
+    const taskToDelete = tasks.find(task => task.id === id);
+    if (!taskToDelete) return;
+
+    dispatch({ type: 'requestDelete', payload: id });
+    setDeletingTask(taskToDelete);
+    showToast(
+      `Task "${taskToDelete.title}" will be deleted in 5 seconds`,
+      'error',
+      () => undoDelete(id), 
+      5000
+    );
   };
 
-  const undoDelete = (id: number | string) => {
-    dispatch({ type: 'undoDelete', payload: id });
+  const undoDelete = (_id?: number | string) => {
+    if (deletingTask) {
+      dispatch({ type: 'undoDelete', payload: deletingTask.id });
+      setDeletingTask(undefined);
+      hideToast();
+      showToast('Deletion cancelled', 'info');
+    }
   };
 
   const clearCompleted = () => {
     dispatch({ type: 'clearCompleted' });
+    showToast('Completed tasks cleared', 'info');
   };
 
   const resetTasks = () => {
     dispatch({ type: 'reset' });
+    showToast('Tasks reset to default', 'info');
   };
-
-  
 
   return (
     <TaskContext.Provider
@@ -117,6 +148,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
         filter,
         search,
         editingTask,
+        deletingTask,
         toast,
         setFilter,
         setSearch,

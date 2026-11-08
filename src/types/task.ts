@@ -7,6 +7,7 @@ export class Task {
   completed: boolean;  
   priority: Priority;  
   category: string;    
+  isDeleting: boolean;
 
   constructor(
     id: number | string,
@@ -14,7 +15,8 @@ export class Task {
     description: string,
     completed: boolean,
     priority: Priority,
-    category: string) 
+    category: string,
+    isDeleting: boolean = false) 
     {
     this.id = id;
     this.title = title;
@@ -22,5 +24,6 @@ export class Task {
     this.completed = completed;
     this.priority = priority;
     this.category = category;
+    this.isDeleting = isDeleting;
   }
 }

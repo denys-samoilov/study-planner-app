@@ -8,9 +8,10 @@ interface ToastProps {
     type?: ToastType;
     onClose: () => void;
     duration?: number;
+    onUndo?: () => void; 
 }
 
-export function Toast({isOpen, message, type = 'success', onClose, duration = 3000 }: ToastProps) {
+export function Toast({ isOpen, message, type = 'success', onClose, duration = 3000, onUndo }: ToastProps) {
     if (!isOpen) return null;
 
     useEffect(() => {
@@ -33,12 +34,24 @@ export function Toast({isOpen, message, type = 'success', onClose, duration = 30
         role="alert" 
         aria-live="assertive" 
         aria-atomic="true"
-        style={{ zIndex: 1080, minWidth: '250px' }}
+        style={{ zIndex: 1080, minWidth: '280px' }}
       >
         <div className="d-flex align-items-center p-3">
           <div className="toast-body p-0 flex-grow-1">
             {message}
           </div>
+          {onUndo && (
+            <button 
+              type="button" 
+              className="btn btn-sm btn-light text-dark fw-bold ms-2 px-2 py-1"
+              onClick={() => {
+                onUndo();
+                onClose();
+              }}
+            >
+              Undo
+            </button>
+          )}
           <button 
             type="button" 
             className="btn-close btn-close-white ms-3" 

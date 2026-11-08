@@ -54,7 +54,7 @@ export function TaskItem({ task }: TaskItemProps) {
             )}
 
             <button 
-              onClick={isDeleting ? () => undoDelete(task.id) : () => requestDelete(task.id)}
+              onClick={isDeleting ? () => undoDelete() : () => requestDelete(task.id)}
               className="btn btn-sm btn-danger"
             >
               {isDeleting ? "Undo" : "Delete Task"}

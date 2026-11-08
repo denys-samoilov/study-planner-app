@@ -12,16 +12,21 @@ interface ToastProps {
 }
 
 export function Toast({ isOpen, message, type = 'success', duration = 3000, onUndo }: ToastProps) {
+  
   const {hideToast} = useTaskContext();
-    if (!isOpen) return null;
-
-    useEffect(() => {
+  
+  useEffect(() => {
       const timer = setTimeout(() => {
         hideToast();
       }, duration);
 
       return () => clearTimeout(timer);
     }, [hideToast, duration]);
+
+    
+    if (!isOpen) return null;
+
+    
 
     const bgClasses = {
       success: 'bg-success text-white',
@@ -47,7 +52,6 @@ export function Toast({ isOpen, message, type = 'success', duration = 3000, onUn
               className="btn btn-sm btn-light text-dark fw-bold ms-2 px-2 py-1"
               onClick={() => {
                 onUndo();
-                hideToast();
               }}
             >
               Undo

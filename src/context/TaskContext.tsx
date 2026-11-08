@@ -44,7 +44,7 @@ interface TaskContextType {
   updateTask: (task: Task) => void;
   toggleTask: (id: number | string) => void;
   requestDelete: (id: number | string) => void;
-  undoDelete: (id?: number | string) => void; 
+  undoDelete: () => void; 
   clearCompleted: () => void;
   resetTasks: () => void;
 }
@@ -137,15 +137,14 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
     showToast(
       `Task "${taskToDelete.title}" will be deleted in 5 seconds`,
       'error',
-      () => undoDelete(id), 
+      () => undoDelete(), 
       5000
     );
   };
 
-  const undoDelete = (_id?: number | string) => {
+  const undoDelete = () => {
     if (deletingTask) {
       dispatch({ type: 'undoDelete', payload: deletingTask.id });
-      hideToast();
       showToast('Deletion cancelled', 'info');
     }
   };

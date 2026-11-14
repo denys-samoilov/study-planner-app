@@ -39,7 +39,7 @@ interface TaskContextType {
   hideToast: () => void;
   addTask: (task: Task) => void;
   updateTask: (task: Task) => void;
-  toggleTask: (id: number | string) => void;
+  toggleTask: (id: number) => void;
   requestDelete: (id: number | string) => void;
   undoDelete: () => void; 
   clearCompleted: () => void;
@@ -97,12 +97,12 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   }, [page]);
 
 
-
   useEffect(() => {
     const deletingTaskId = deletingTask?.id;
     if (deletingTaskId === undefined) return;
 
-    const timer = setTimeout(() => {
+    const timer = setTimeout(async () => {
+      await taskRepository.delete(deletingTaskId);
       dispatch({ type: 'confirmDelete', payload: deletingTaskId });
       showToast('Task deleted permanently', 'error');
     }, 5000);
@@ -142,20 +142,53 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
         return filteredTasks;
     };
 
-  const addTask = (newTask: Task) => {
-    dispatch({ type: 'add', payload: newTask });
-    showToast('Task created successfully!', 'success');
+  const addTask = async (newTaskData: Task) => {
+    try {
+      const createdTask = await taskRepository.create(newTaskData);
+      dispatch({ type: 'add', payload: createdTask });
+      showToast('Task created successfully!', 'success');
+    } 
+    catch (err) {
+      console.error('Failed to create task:', err);
+      showToast('Failed to create task.', 'error');
+    }
   };
 
-  const updateTask = (updatedTask: Task) => {
-    dispatch({ type: 'update', payload: updatedTask });
-    setEditingTask(null);
-    showToast('Task updated successfully!', 'success');
+  const updateTask = async (updatedTask: Task) => {
+    try {
+      const data = await taskRepository.update(updatedTask.id, updatedTask);
+
+      dispatch({ type: 'update', payload: data });
+      setEditingTask(null);
+      showToast('Task updated successfully!', 'success');
+    } 
+    catch (err) {
+      console.error('Failed to update task:', err);
+      showToast('Failed to update task. Please try again.', 'error');
+    }
   };
 
-  const toggleTask = (id: number | string) => {
-    dispatch({ type: 'toggle', payload: id });
-    showToast('Task toggled', 'info');
+  const toggleTask = async (id: number) => {
+    const taskToToggle = tasks.find(task => task.id === id);
+    if (!taskToToggle) return;
+
+    const updatedTask: Task = {
+      ...taskToToggle,
+      completed: !taskToToggle.completed,
+    };
+
+    try {
+      await taskRepository.update(id, updatedTask);
+      dispatch({ type: 'toggle', payload: id });
+      showToast(
+        updatedTask.completed ? 'Task marked as completed' : 'Task marked as active',
+        'info'
+      );
+    } 
+    catch (err) {
+      console.error('Failed to toggle task status:', err);
+      showToast('Failed to update task status.', 'error');
+    }
   };
 
   const requestDelete = (id: number | string) => {

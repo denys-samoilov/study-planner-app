@@ -7,6 +7,7 @@ import { TaskEditModal } from './components/TaskEditModal';
 import { TaskProvider } from './context/TaskContext';
 import { useTaskContext } from './hooks/useTaskContext';
 import { Toast } from './components/Toast';
+import { Pagination } from './components/Pagination';
 
 function MainContent() {
   const { 
@@ -39,6 +40,7 @@ function MainContent() {
         tasks={filterTasks()} 
         currentFilter={filter}
       />
+      <Pagination/>
 
       <TaskEditModal 
         isOpen={editingTask !== null}

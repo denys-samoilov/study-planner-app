@@ -1,6 +1,5 @@
 import React, { createContext, useReducer, useState, useEffect } from 'react';
 import { Task } from '../types/task';
-import { initialTasks } from '../data/initialTasks';
 import { taskReducer } from '../reducers/taskReducer';
 import { type FilterType } from '../components/TaskFilters';
 import { useLocalStorage } from '../hooks/useLocalStorage';
@@ -9,18 +8,6 @@ import { taskRepository } from '../repositories/taskRepository';
 
 const tasksKey = 'study_planner_tasks';
 
-function loadInitialTasks(): Task[] {
-  try {
-    const saved = window.localStorage.getItem(tasksKey);
-    if (!saved) return initialTasks;
-    const parsed = JSON.parse(saved);
-    return Array.isArray(parsed) ? parsed : initialTasks;
-  }
-  catch (error) {
-    console.error('Error loading tasks from localStorage:', error);
-    return initialTasks;
-  }
-}
 
 interface ToastState {
   message: string;
@@ -30,12 +17,16 @@ interface ToastState {
 }
 
 interface TaskContextType {
+  page: number;
+  limit: number;
   tasks: Task[];
   filter: FilterType;
   search: string;
   editingTask: Task | null;
   deletingTask: Task | undefined;
   toast: ToastState | null;
+  nextPage: () => void;
+  prevPage: () => void;
   setFilter: (filter: FilterType) => void;
   setSearch: (search: string) => void;
   setEditingTask: (task: Task | null) => void;
@@ -57,7 +48,9 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   const [filter, setFilter] = useLocalStorage<FilterType>('study_planner_filter', 'all');
   const [search, setSearch] = useLocalStorage<string>('study_planner_search', '');
   const [editingTask, setEditingTask] = useState<Task | null>(null);
-  
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+
   const [toast, setToast] = useState<ToastState | null>(null);
 
   const deletingTask = tasks.find(task => task.isDeleting);  
@@ -70,19 +63,23 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
     setToast(null);
   }
 
-  useEffect(() => {
-    async function fetchInitialTasks() {
-      try {
-        const serverTasks = await taskRepository.getAll(5);
-        dispatch({ type: 'setTasks', payload: serverTasks });
-      } 
-      catch (error) {
-        console.error('Failed to load tasks from API:', error);
-      }
-    }
+  const nextPage = () => setPage(prev => prev + 1);
+  const prevPage = () => setPage(prev => Math.max(prev - 1, 1));
 
-    fetchInitialTasks();
-  }, []);
+  useEffect(() => {
+  async function fetchTasksForPage() {
+    try {
+      const skip = (page - 1) * limit;
+      const serverTasks = await taskRepository.getAll(limit, skip);
+      dispatch({ type: 'setTasks', payload: serverTasks });
+    } 
+    catch (error) {
+      console.error('Failed to load tasks from API:', error);
+    }
+  }
+  fetchTasksForPage(); }, [page]);
+
+
 
   useEffect(() => {
     const deletingTaskId = deletingTask?.id;
@@ -177,12 +174,16 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   return (
     <TaskContext.Provider
       value={{
+        page,
+        limit,
         tasks,
         filter,
         search,
         editingTask,
         deletingTask,
         toast,
+        nextPage,
+        prevPage,
         setFilter,
         setSearch,
         setEditingTask,

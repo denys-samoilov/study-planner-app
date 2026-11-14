@@ -30,7 +30,7 @@ export const taskRepository = {
     return data.todos.map(toTask);
   },
 
-  async getById(id: number | string): Promise<Task> {
+  async getById(id: number): Promise<Task> {
     const data = await httpClient<ApiTodo>(`/todos/${id}`);
     return toTask(data);
   },

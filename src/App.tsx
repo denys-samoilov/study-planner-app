@@ -8,6 +8,7 @@ import { TaskProvider } from './context/TaskContext';
 import { useTaskContext } from './hooks/useTaskContext';
 import { Toast } from './components/Toast';
 import { Pagination } from './components/Pagination';
+import { TaskDetailModal } from './components/TaskDetailModal';
 
 function MainContent() {
   const { 
@@ -17,6 +18,7 @@ function MainContent() {
     editingTask, 
     deletingTask,
     toast, 
+    viewingTask,
     filterTasks,
     undoDelete
   } = useTaskContext();
@@ -44,6 +46,10 @@ function MainContent() {
 
       <TaskEditModal 
         isOpen={editingTask !== null}
+      />
+
+      <TaskDetailModal
+        isOpen={viewingTask !== null}
       />
 
       <Toast

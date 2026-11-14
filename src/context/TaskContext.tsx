@@ -22,6 +22,7 @@ interface TaskContextType {
   tasks: Task[];
   filter: FilterType;
   search: string;
+  viewingTask: Task | null;
   editingTask: Task | null;
   deletingTask: Task | undefined;
   toast: ToastState | null;
@@ -30,6 +31,7 @@ interface TaskContextType {
   fetchTasksForPage: () => void;
   nextPage: () => void;
   prevPage: () => void;
+  setViewingTask: (task: Task | null) => void;
   setFilter: (filter: FilterType) => void;
   setSearch: (search: string) => void;
   setEditingTask: (task: Task | null) => void;
@@ -48,11 +50,12 @@ export const TaskContext = createContext<TaskContextType | undefined>(undefined)
 
 export function TaskProvider({ children }: { children: React.ReactNode }) {
   const [tasks, dispatch] = useReducer(taskReducer, []);
+  const [viewingTask, setViewingTask] = useState<Task | null>(null);
   const [filter, setFilter] = useLocalStorage<FilterType>('study_planner_filter', 'all');
   const [search, setSearch] = useLocalStorage<string>('study_planner_search', '');
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(10);
+  const [limit] = useState(10);
 
   const [toast, setToast] = useState<ToastState | null>(null);
 
@@ -191,6 +194,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
         page,
         limit,
         tasks,
+        viewingTask,
         filter,
         search,
         editingTask,
@@ -201,6 +205,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
         fetchTasksForPage,
         nextPage,
         prevPage,
+        setViewingTask,
         setFilter,
         setSearch,
         setEditingTask,

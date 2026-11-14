@@ -2,6 +2,7 @@ import { Task } from '../types/task';
 import { initialTasks } from '../data/initialTasks';
 
 export type TaskAction = 
+  | { type: 'setTasks'; payload: Task[] }
   | { type: 'add'; payload: Task }
   | { type: 'toggle'; payload: number | string }
   | { type: 'update'; payload: Task }
@@ -13,6 +14,10 @@ export type TaskAction =
 
 export function taskReducer(state: Task[], action: TaskAction): Task[] {
   switch (action.type) {
+
+    case 'setTasks':
+      return action.payload;
+
     case 'add':
       return [action.payload, ...state];
 

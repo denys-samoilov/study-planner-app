@@ -1,7 +1,7 @@
 export type Priority = 'low' | 'medium' | 'high';
 
 export class Task {
-  id: number | string; 
+  id: number; 
   title: string;       
   description: string; 
   completed: boolean;  
@@ -10,7 +10,7 @@ export class Task {
   isDeleting: boolean;
 
   constructor(
-    id: number | string,
+    id: number,
     title: string,
     description: string,
     completed: boolean,

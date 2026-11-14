@@ -5,6 +5,7 @@ import { taskReducer } from '../reducers/taskReducer';
 import { type FilterType } from '../components/TaskFilters';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import type { ToastType } from '../components/Toast';
+import { taskRepository } from '../repositories/taskRepository';
 
 const tasksKey = 'study_planner_tasks';
 
@@ -52,7 +53,7 @@ interface TaskContextType {
 export const TaskContext = createContext<TaskContextType | undefined>(undefined);
 
 export function TaskProvider({ children }: { children: React.ReactNode }) {
-  const [tasks, dispatch] = useReducer(taskReducer, loadInitialTasks());
+  const [tasks, dispatch] = useReducer(taskReducer, []);
   const [filter, setFilter] = useLocalStorage<FilterType>('study_planner_filter', 'all');
   const [search, setSearch] = useLocalStorage<string>('study_planner_search', '');
   const [editingTask, setEditingTask] = useState<Task | null>(null);
@@ -68,6 +69,20 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   const hideToast = () => {
     setToast(null);
   }
+
+  useEffect(() => {
+    async function fetchInitialTasks() {
+      try {
+        const serverTasks = await taskRepository.getAll(5);
+        dispatch({ type: 'setTasks', payload: serverTasks });
+      } 
+      catch (error) {
+        console.error('Failed to load tasks from API:', error);
+      }
+    }
+
+    fetchInitialTasks();
+  }, []);
 
   useEffect(() => {
     const deletingTaskId = deletingTask?.id;

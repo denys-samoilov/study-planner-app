@@ -25,6 +25,9 @@ interface TaskContextType {
   editingTask: Task | null;
   deletingTask: Task | undefined;
   toast: ToastState | null;
+  isLoading: boolean;
+  error: string | null;
+  fetchTasksForPage: () => void;
   nextPage: () => void;
   prevPage: () => void;
   setFilter: (filter: FilterType) => void;
@@ -55,6 +58,9 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
 
   const deletingTask = tasks.find(task => task.isDeleting);  
 
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+
   const showToast = (message: string, type: ToastType = 'success', onUndo?: () => void, duration = 3000) => {
     setToast({ message, type, onUndo, duration });
   }
@@ -66,8 +72,9 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   const nextPage = () => setPage(prev => prev + 1);
   const prevPage = () => setPage(prev => Math.max(prev - 1, 1));
 
-  useEffect(() => {
-  async function fetchTasksForPage() {
+  const fetchTasksForPage = async () => {
+    setIsLoading(true);
+    setError(null);
     try {
       const skip = (page - 1) * limit;
       const serverTasks = await taskRepository.getAll(limit, skip);
@@ -75,9 +82,16 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
     } 
     catch (error) {
       console.error('Failed to load tasks from API:', error);
+      setError('Failed to load tasks. Please try again later.');
+    }
+    finally {    
+      setIsLoading(false);
     }
   }
-  fetchTasksForPage(); }, [page]);
+
+  useEffect(() => {
+    fetchTasksForPage(); 
+  }, [page]);
 
 
 
@@ -182,6 +196,9 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
         editingTask,
         deletingTask,
         toast,
+        isLoading,
+        error,
+        fetchTasksForPage,
         nextPage,
         prevPage,
         setFilter,

@@ -89,7 +89,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
       console.error('Failed to load tasks from API:', error);
       setError('Failed to load tasks. Please try again later.');
     }
-    
+
     setIsLoading(false);
     
   }
@@ -182,14 +182,16 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
     };
 
     try {
-      await taskRepository.update(id, updatedTask);
       dispatch({ type: 'toggle', payload: id });
+      await taskRepository.update(id, updatedTask);
+
       showToast(
         updatedTask.completed ? 'Task marked as completed' : 'Task marked as active',
         'info'
       );
     } 
     catch (err) {
+      dispatch({ type: 'toggle', payload: id });
       console.error('Failed to toggle task status:', err);
       showToast('Failed to update task status.', 'error');
     }

@@ -52,7 +52,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   const [filter, setFilter] = useLocalStorage<FilterType>('study_planner_filter', 'all');
   const [search, setSearch] = useLocalStorage<string>('study_planner_search', '');
   const [editingTask, setEditingTask] = useState<Task | null>(null);
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useLocalStorage<number>('study_planner_page', 1);
   const [limit] = useState(10);
 
   const [toast, setToast] = useState<ToastState | null>(null);
@@ -70,8 +70,8 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
     setToast(null);
   }
 
-  const nextPage = () => setPage(prev => prev + 1);
-  const prevPage = () => setPage(prev => Math.max(prev - 1, 1));
+  const nextPage = () => setPage((prev: number) => prev + 1);
+  const prevPage = () => setPage((prev: number) => Math.max(prev - 1, 1));
 
   const fetchTasksForPage = async (signal?: AbortSignal) => {
     setIsLoading(true);

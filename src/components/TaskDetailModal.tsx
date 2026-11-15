@@ -15,21 +15,20 @@ export function TaskDetailModal({ isOpen }: TaskDetailModalProps) {
   const [error, setError] = useState<string | null>(null);
 
 
-  useEffect(() => {
-    if (!viewingTask) {
-      setTask(null);
-      return;
-    }
+  async function fetchTaskDetails(signal: AbortSignal) {
 
-    async function fetchTaskDetails() {
       setIsLoading(true);
       setError(null);
       try {
-        const fetchedTask = await taskRepository.getById(viewingTask!.id);
+        const fetchedTask = await taskRepository.getById(viewingTask!.id, signal);
         setTask(fetchedTask);
       } 
       
-      catch (err) {
+      catch (err: any) {
+        if(err.name == 'AbortError'){
+          console.log('Details fetch aborted')
+          return;
+        }
         console.error('Failed to fetch task details:', err);
         setError('Failed to fetch task details.');
       } 
@@ -39,7 +38,18 @@ export function TaskDetailModal({ isOpen }: TaskDetailModalProps) {
       }
     }
 
-    fetchTaskDetails();
+
+  useEffect(() => {
+    if (!viewingTask) {
+      setTask(null);
+      return;
+    }
+
+    const controller = new AbortController();
+
+    fetchTaskDetails(controller.signal);
+
+    return () => {controller.abort()}
   }, [viewingTask]);
 
   if (!isOpen) return null;
@@ -90,7 +100,7 @@ export function TaskDetailModal({ isOpen }: TaskDetailModalProps) {
                   </div>
 
                   <div className="col-6">
-                    <span className="text-muted small text-uppercase fw-bold d-block">Пріоритет</span>
+                    <span className="text-muted small text-uppercase fw-bold d-block">Priority</span>
                     <span className="badge bg-warning text-dark mt-1">{task.priority}</span>
                   </div>
 
@@ -117,7 +127,7 @@ export function TaskDetailModal({ isOpen }: TaskDetailModalProps) {
               className="btn btn-secondary btn-sm"
               onClick={() => setViewingTask(null)}
             >
-              Закрити
+              Close
             </button>
           </div>
         </div>

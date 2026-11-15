@@ -6,8 +6,6 @@ import { useLocalStorage } from '../hooks/useLocalStorage';
 import type { ToastType } from '../components/Toast';
 import { taskRepository } from '../repositories/taskRepository';
 
-const tasksKey = 'study_planner_tasks';
-
 
 interface ToastState {
   message: string;
@@ -75,25 +73,35 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   const nextPage = () => setPage(prev => prev + 1);
   const prevPage = () => setPage(prev => Math.max(prev - 1, 1));
 
-  const fetchTasksForPage = async () => {
+  const fetchTasksForPage = async (signal?: AbortSignal) => {
     setIsLoading(true);
     setError(null);
     try {
       const skip = (page - 1) * limit;
-      const serverTasks = await taskRepository.getAll(limit, skip);
+      const serverTasks = await taskRepository.getAll(limit, skip, signal);
       dispatch({ type: 'setTasks', payload: serverTasks });
     } 
-    catch (error) {
+    catch (error: any) {
+      if(error.name == 'AbortError'){
+        console.log('Fetch aborted');
+        return;
+      }
       console.error('Failed to load tasks from API:', error);
       setError('Failed to load tasks. Please try again later.');
     }
-    finally {    
-      setIsLoading(false);
-    }
+    
+    setIsLoading(false);
+    
   }
 
   useEffect(() => {
-    fetchTasksForPage(); 
+    const controller = new AbortController();
+
+    fetchTasksForPage(controller.signal); 
+
+    return () => {
+      controller.abort();
+    };
   }, [page]);
 
 
@@ -111,15 +119,11 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   }, [deletingTask]);
 
   useEffect(() => {
-      window.localStorage.setItem(tasksKey, JSON.stringify(tasks));
-
-      const amountOfActiveTasks = tasks.filter(task => !task.completed).length;
-
-      if (amountOfActiveTasks > 0) {
-        document.title = "Study Planner - " + amountOfActiveTasks + " active task" + (amountOfActiveTasks !== 1 ? "s" : "");
-      }
-      else document.title = "Study Planner";
-  }, [tasks]);
+      
+        document.title = "Study Planner - Page " + page;
+      
+      
+  }, [page]);
 
   const filterTasks = (): Task[] => {
         let filteredTasks = tasks;

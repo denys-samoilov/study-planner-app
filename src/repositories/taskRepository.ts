@@ -25,18 +25,19 @@ function toApiTodo(task: Task): ApiTodo {
 }
 
 export const taskRepository = {
-  async getAll(limit = 10, skip = 0): Promise<Task[]> {
-    const data = await httpClient<TodosResponse>(`/todos?limit=${limit}&skip=${skip}`);
+  async getAll(limit = 10, skip = 0, signal?: AbortSignal): Promise<Task[]> {
+    const data = await httpClient<TodosResponse>(`/todos?limit=${limit}&skip=${skip}`, {signal});
     return data.todos.map(toTask);
   },
 
-  async getById(id: number): Promise<Task> {
-    const data = await httpClient<ApiTodo>(`/todos/${id}`);
+  async getById(id: number, signal?: AbortSignal): Promise<Task> {
+    const data = await httpClient<ApiTodo>(`/todos/${id}`, {signal});
     return toTask(data);
   },
 
-  async create(task: Task): Promise<Task> {
+  async create(task: Task, signal?: AbortSignal): Promise<Task> {
     const data = await httpClient<ApiTodo>('/todos/add', {
+      signal,
       method: 'POST',
       body: JSON.stringify(toApiTodo(task)),
     });
@@ -49,8 +50,9 @@ export const taskRepository = {
     };
   },
 
-  async update(id: number | string, task: Task): Promise<Task> {
+  async update(id: number, task: Task, signal?: AbortSignal): Promise<Task> {
     const data = await httpClient<ApiTodo>(`/todos/${id}`, {
+      signal,
       method: 'PUT',
       body: JSON.stringify(toApiTodo(task)),
     });
@@ -63,8 +65,9 @@ export const taskRepository = {
     };
   },
 
-  async delete(id: number | string): Promise<void> {
+  async delete(id: number, signal?: AbortSignal): Promise<void> {
     await httpClient<void>(`/todos/${id}`, {
+      signal,
       method: 'DELETE',
     });
   },

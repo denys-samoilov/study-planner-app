@@ -1,9 +1,7 @@
 import { useTaskContext } from "../hooks/useTaskContext";
 
-export type FilterType = 'all' | 'completed' | 'active';
-
 interface TaskFiltersProps {
-  currentFilter: FilterType;
+  currentFilter: string;
   currentSearch: string;
 }
 

@@ -17,7 +17,6 @@ import { TaskDetailsPage } from './pages/TaskDetailsPage';
 function MainContent() {
 
   return (
-    <BrowserRouter>
       <AppLayout>        
 
         <div className="container py-5" style={{ maxWidth: '700px' }}>
@@ -60,15 +59,17 @@ function MainContent() {
         </div>
       </AppLayout>
 
-    </BrowserRouter>
   );
 }
 
 export function App() {
   return (
-    <TaskProvider>
-      <MainContent />
-    </TaskProvider>
+    <BrowserRouter>
+      <TaskProvider>
+        <MainContent />
+      </TaskProvider>
+    </BrowserRouter>
+
   );
 }
 

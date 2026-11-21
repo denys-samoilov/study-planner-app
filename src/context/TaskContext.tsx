@@ -1,11 +1,10 @@
 import React, { createContext, useReducer, useState, useEffect } from 'react';
 import { Task } from '../types/task';
 import { taskReducer } from '../reducers/taskReducer';
-import { type FilterType } from '../components/TaskFilters';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import type { ToastType } from '../components/Toast';
 import { taskRepository } from '../repositories/taskRepository';
-
+import { useSearchParams } from 'react-router-dom';
 
 interface ToastState {
   message: string;
@@ -18,7 +17,7 @@ interface TaskContextType {
   page: number;
   limit: number;
   tasks: Task[];
-  filter: FilterType;
+  filter: string;
   search: string;
   viewingTask: Task | null;
   editingTask: Task | null;
@@ -30,7 +29,7 @@ interface TaskContextType {
   nextPage: () => void;
   prevPage: () => void;
   setViewingTask: (task: Task | null) => void;
-  setFilter: (filter: FilterType) => void;
+  setFilter: (filter: string) => void;
   setSearch: (search: string) => void;
   setEditingTask: (task: Task | null) => void;
   filterTasks: () => Task[];
@@ -39,36 +38,67 @@ interface TaskContextType {
   updateTask: (task: Task) => void;
   toggleTask: (id: number) => void;
   requestDelete: (id: number | string) => void;
-  undoDelete: () => void; 
+  undoDelete: () => void;
   clearCompleted: () => void;
   resetTasks: () => void;
 }
 
 export const TaskContext = createContext<TaskContextType | undefined>(undefined);
 
+
 export function TaskProvider({ children }: { children: React.ReactNode }) {
   const [tasks, dispatch] = useReducer(taskReducer, []);
   const [viewingTask, setViewingTask] = useState<Task | null>(null);
-  const [filter, setFilter] = useLocalStorage<FilterType>('study_planner_filter', 'all');
-  const [search, setSearch] = useLocalStorage<string>('study_planner_search', '');
+
+  const [searchParams, setSearchParams] = useSearchParams();
+
+
+  const filter = searchParams.get('completion') ?? 'all';
+
+  const search = searchParams.get('q') ?? '';
+
+  const setFilter = (nextFilter: string) => {
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      if (nextFilter === 'all') {
+        next.delete('completion');
+      } else {
+        next.set('completion', nextFilter);
+      }
+      return next;
+    });
+  };
+
+  const setSearch = (nextSearch: string) => {
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      if (!nextSearch.trim()) {
+        next.delete('q');
+      } else {
+        next.set('q', nextSearch);
+      }
+      return next;
+    });
+  };
+
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [page, setPage] = useLocalStorage<number>('study_planner_page', 1);
   const [limit] = useState(10);
 
   const [toast, setToast] = useState<ToastState | null>(null);
 
-  const deletingTask = tasks.find(task => task.isDeleting);  
+  const deletingTask = tasks.find(task => task.isDeleting);
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
   const showToast = (message: string, type: ToastType = 'success', onUndo?: () => void, duration = 3000) => {
     setToast({ message, type, onUndo, duration });
-  }
+  };
 
   const hideToast = () => {
     setToast(null);
-  }
+  };
 
   const nextPage = () => setPage((prev: number) => prev + 1);
   const prevPage = () => setPage((prev: number) => Math.max(prev - 1, 1));
@@ -80,9 +110,8 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
       const skip = (page - 1) * limit;
       const serverTasks = await taskRepository.getAll(limit, skip, signal);
       dispatch({ type: 'setTasks', payload: serverTasks });
-    } 
-    catch (error: any) {
-      if(error.name == 'AbortError'){
+    } catch (error: any) {
+      if (error.name == 'AbortError') {
         console.log('Fetch aborted');
         return;
       }
@@ -91,19 +120,17 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
     }
 
     setIsLoading(false);
-    
-  }
+  };
 
   useEffect(() => {
     const controller = new AbortController();
 
-    fetchTasksForPage(controller.signal); 
+    fetchTasksForPage(controller.signal);
 
     return () => {
       controller.abort();
     };
   }, [page]);
-
 
   useEffect(() => {
     const deletingTaskId = deletingTask?.id;
@@ -119,40 +146,38 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   }, [deletingTask]);
 
   useEffect(() => {
-      
-        document.title = "Study Planner - Page " + page;
-      
-      
+    document.title = 'Study Planner - Page ' + page;
   }, [page]);
 
   const filterTasks = (): Task[] => {
-        let filteredTasks = tasks;
-        switch (filter) {
-          case 'completed':
-            filteredTasks = tasks.filter((task) => task.completed);
-            break;
-          case 'active':
-            filteredTasks = tasks.filter((task) => !task.completed);
-            break;
-          default:
-            filteredTasks = tasks;
-        }
-    
-        if (search.trim() !== '') {
-          filteredTasks = filteredTasks.filter((task) =>
-            task.title.toLowerCase().includes(search.toLowerCase())
-          );
-        }
-        return filteredTasks;
-    };
+    let filteredTasks = tasks;
+
+    switch (filter) {
+      case 'completed':
+        filteredTasks = filteredTasks.filter((task) => task.completed);
+        break;
+      case 'active':
+        filteredTasks = filteredTasks.filter((task) => !task.completed);
+        break;
+      default:
+        break;
+    }
+
+    if (search.trim() !== '') {
+      filteredTasks = filteredTasks.filter((task) =>
+        task.title.toLowerCase().includes(search.toLowerCase())
+      );
+    }
+
+    return filteredTasks;
+  };
 
   const addTask = async (newTaskData: Task) => {
     try {
       const createdTask = await taskRepository.create(newTaskData);
       dispatch({ type: 'add', payload: createdTask });
       showToast('Task created successfully!', 'success');
-    } 
-    catch (err) {
+    } catch (err) {
       console.error('Failed to create task:', err);
       showToast('Failed to create task.', 'error');
     }
@@ -165,8 +190,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
       dispatch({ type: 'update', payload: data });
       setEditingTask(null);
       showToast('Task updated successfully!', 'success');
-    } 
-    catch (err) {
+    } catch (err) {
       console.error('Failed to update task:', err);
       showToast('Failed to update task. Please try again.', 'error');
     }
@@ -189,8 +213,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
         updatedTask.completed ? 'Task marked as completed' : 'Task marked as active',
         'info'
       );
-    } 
-    catch (err) {
+    } catch (err) {
       dispatch({ type: 'toggle', payload: id });
       console.error('Failed to toggle task status:', err);
       showToast('Failed to update task status.', 'error');
@@ -205,7 +228,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
     showToast(
       `Task "${taskToDelete.title}" will be deleted in 5 seconds`,
       'error',
-      () => undoDelete(), 
+      () => undoDelete(),
       5000
     );
   };

@@ -1,11 +1,10 @@
 import { useTaskContext } from '../hooks/useTaskContext';
 import { Task } from '../types/task';
-import type { FilterType } from './TaskFilters';
 import { TaskItem } from './TaskItem';
 
 interface TaskListProps {
   tasks: Task[];
-  currentFilter: FilterType;
+  currentFilter: string;
 }
 
 export function TaskList({ tasks, currentFilter }: TaskListProps) {

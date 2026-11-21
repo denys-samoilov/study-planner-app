@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Task, type Priority } from '../types/task';
 import { useTaskContext } from '../hooks/useTaskContext';
 
@@ -9,22 +9,6 @@ export function TaskForm() {
   const [description, setDescription] = useState('');
   const [priority, setPriority] = useState<Priority>('medium');
   const [category, setCategory] = useState('');
-
-  useEffect(() => {
-    if (editingTask) {
-      setTitle(editingTask.title);
-      setDescription(editingTask.description);
-      setPriority(editingTask.priority);
-      setCategory(editingTask.category);
-    } 
-    
-    else {
-      setTitle('');
-      setDescription('');
-      setPriority('medium');
-      setCategory('');
-    }
-  }, [editingTask]);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

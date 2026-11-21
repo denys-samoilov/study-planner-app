@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Task } from '../types/task';
 import { taskRepository } from '../repositories/taskRepository';
 import { useTaskContext } from '../hooks/useTaskContext';
@@ -10,49 +10,58 @@ interface TaskDetailModalProps {
 export function TaskDetailModal({ isOpen }: TaskDetailModalProps) {
   const { viewingTask, setViewingTask } = useTaskContext();
 
-  const [task, setTask] = useState<Task | null>(null);
+  const [fetchedTask, setFetchedTask] = useState<Task | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
+  const viewingTaskId = viewingTask?.id;
 
-  async function fetchTaskDetails(signal: AbortSignal) {
+  const fetchTaskDetails = useCallback(
+    async (signal: AbortSignal, isCancelled: () => boolean) => {
+      if (viewingTaskId === undefined) return;
 
       setIsLoading(true);
       setError(null);
       try {
-        const fetchedTask = await taskRepository.getById(viewingTask!.id, signal);
-        setTask(fetchedTask);
-      } 
-      
-      catch (err: any) {
-        if(err.name == 'AbortError'){
-          console.log('Details fetch aborted')
+        const result = await taskRepository.getById(viewingTaskId, signal);
+        if (!isCancelled()) {
+          setFetchedTask(result);
+        }
+      } catch (err: unknown) {
+        if (err instanceof Error && err.name === 'AbortError') {
+          console.log('Details fetch aborted');
           return;
         }
-        console.error('Failed to fetch task details:', err);
-        setError('Failed to fetch task details.');
-      } 
-      
-      finally {
-        setIsLoading(false);
+        if (!isCancelled()) {
+          console.error('Failed to fetch task details:', err);
+          setError('Failed to fetch task details.');
+        }
+      } finally {
+        if (!isCancelled()) {
+          setIsLoading(false);
+        }
       }
-    }
-
+    },
+    [viewingTaskId]
+  );
 
   useEffect(() => {
-    if (!viewingTask) {
-      setTask(null);
-      return;
-    }
+    if (viewingTaskId === undefined) return;
 
     const controller = new AbortController();
+    let cancelled = false;
 
-    fetchTaskDetails(controller.signal);
+    void fetchTaskDetails(controller.signal, () => cancelled);
 
-    return () => {controller.abort()}
-  }, [viewingTask]);
+    return () => {
+      cancelled = true;
+      controller.abort();
+    };
+  }, [viewingTaskId, fetchTaskDetails]);
 
   if (!isOpen) return null;
+
+  const task = viewingTask ? fetchedTask : null;
 
   return (
     <div className="modal show d-block" tabIndex={-1} style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
@@ -60,17 +69,17 @@ export function TaskDetailModal({ isOpen }: TaskDetailModalProps) {
         <div className="modal-content">
           <div className="modal-header">
             <h5 className="modal-title">Details</h5>
-            <button 
-              type="button" 
-              className="btn-close" 
+            <button
+              type="button"
+              className="btn-close"
               onClick={() => setViewingTask(null)}
-            ></button>
+            />
           </div>
 
           <div className="modal-body">
             {isLoading && (
               <div className="text-center py-4 text-muted">
-                <div className="spinner-border spinner-border-sm me-2" role="status"></div>
+                <div className="spinner-border spinner-border-sm me-2" role="status" />
                 Loading...
               </div>
             )}
@@ -90,7 +99,7 @@ export function TaskDetailModal({ isOpen }: TaskDetailModalProps) {
 
                 <div className="mb-3">
                   <span className="text-muted small text-uppercase fw-bold d-block">Description</span>
-                  <p className="text-secondary mb-0">{task.description || "No description"}</p>
+                  <p className="text-secondary mb-0">{task.description || 'No description'}</p>
                 </div>
 
                 <div className="row g-2 mb-3">
@@ -105,18 +114,16 @@ export function TaskDetailModal({ isOpen }: TaskDetailModalProps) {
                   </div>
 
                   <div>
-                  <span className="text-muted small text-uppercase fw-bold d-block">Status</span>
-                  <p className="mt-1 mb-0">
-                    {task.completed ? (
-                      <span className="text-success fw-medium">Complete!</span>
-                    ) : (
-                      <span className="text-warning fw-medium">Active...</span>
-                    )}
-                  </p>
+                    <span className="text-muted small text-uppercase fw-bold d-block">Status</span>
+                    <p className="mt-1 mb-0">
+                      {task.completed ? (
+                        <span className="text-success fw-medium">Complete!</span>
+                      ) : (
+                        <span className="text-warning fw-medium">Active...</span>
+                      )}
+                    </p>
+                  </div>
                 </div>
-            </div>
-
-                
               </div>
             )}
           </div>

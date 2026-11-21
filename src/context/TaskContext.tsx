@@ -1,4 +1,4 @@
-import React, { createContext, useReducer, useState, useEffect } from 'react';
+import React, { createContext, useReducer, useState, useEffect, useCallback } from 'react';
 import { Task } from '../types/task';
 import { taskReducer } from '../reducers/taskReducer';
 import { useLocalStorage } from '../hooks/useLocalStorage';
@@ -103,15 +103,15 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   const nextPage = () => setPage((prev: number) => prev + 1);
   const prevPage = () => setPage((prev: number) => Math.max(prev - 1, 1));
 
-  const fetchTasksForPage = async (signal?: AbortSignal) => {
+  const fetchTasksForPage = useCallback(async (signal?: AbortSignal) => {
     setIsLoading(true);
     setError(null);
     try {
       const skip = (page - 1) * limit;
       const serverTasks = await taskRepository.getAll(limit, skip, signal);
       dispatch({ type: 'setTasks', payload: serverTasks });
-    } catch (error: any) {
-      if (error.name == 'AbortError') {
+    } catch (error: unknown) {
+      if (error instanceof Error && error.name == 'AbortError') {
         console.log('Fetch aborted');
         return;
       }
@@ -120,17 +120,25 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
     }
 
     setIsLoading(false);
-  };
+  }, [page, limit]);
 
   useEffect(() => {
     const controller = new AbortController();
+    let isCancelled = false;
 
-    fetchTasksForPage(controller.signal);
+    const run = async () => {
+      if (!isCancelled) {
+        await fetchTasksForPage(controller.signal);
+      }
+    };
+
+    void run();
 
     return () => {
+      isCancelled = true;
       controller.abort();
     };
-  }, [page]);
+  }, [fetchTasksForPage]);
 
   useEffect(() => {
     const deletingTaskId = deletingTask?.id;

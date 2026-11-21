@@ -22,7 +22,7 @@ export function Toast({ isOpen, message, type = 'success', duration = 3000, onUn
     }, duration);
 
     return () => clearTimeout(timer);
-    }, [isOpen, duration]);
+    }, [isOpen, duration, hideToast]);
 
     
     if (!isOpen) return null;

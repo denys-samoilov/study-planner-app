@@ -14,39 +14,45 @@ export function TaskDetailsPage() {
   const createdAt = new Date().toLocaleString();
 
   useEffect(() => {
-    if (!taskId) {
-      setError('Task ID is missing in URL.');
-      setIsLoading(false);
-      return;
-    }
-
     const controller = new AbortController();
+    let isCancelled = false;
 
     async function loadTask() {
       setIsLoading(true);
       setError(null);
 
+      if (!taskId) {
+        if (!isCancelled) {
+          setTask(null);
+          setError('Task ID is missing in URL.');
+          setIsLoading(false);
+        }
+        return;
+      }
+
       try {
         const fetchedTask = await taskRepository.getById(Number(taskId), controller.signal);
-        setTask(fetchedTask);
-      } 
-      catch (err: unknown) {
+        if (!isCancelled) {
+          setTask(fetchedTask);
+        }
+      } catch (err: unknown) {
         if (err instanceof Error && err.name === 'AbortError') {
           return;
         }
-        setError(err instanceof Error ? err.message : 'Failed to load task details.');
-      } 
-      
-      finally {
-        
+        if (!isCancelled) {
+          setError(err instanceof Error ? err.message : 'Failed to load task details.');
+        }
+      } finally {
+        if (!isCancelled) {
           setIsLoading(false);
-        
+        }
       }
     }
 
-    loadTask();
+    void loadTask();
 
     return () => {
+      isCancelled = true;
       controller.abort();
     };
   }, [taskId]);

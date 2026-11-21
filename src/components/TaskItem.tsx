@@ -1,12 +1,13 @@
 import { Task } from '../types/task';
 import { useTaskContext } from '../hooks/useTaskContext';
+import { NavLink } from 'react-router-dom';
 
 interface TaskItemProps {
   task: Task;
 }
 
 export function TaskItem({ task }: TaskItemProps) {
-  const { toggleTask, requestDelete, undoDelete, setEditingTask, setViewingTask } = useTaskContext();
+  const { toggleTask, requestDelete, undoDelete, setEditingTask } = useTaskContext();
 
   const isDeleting = task.isDeleting;
 
@@ -23,13 +24,17 @@ export function TaskItem({ task }: TaskItemProps) {
     <div className={`card mb-3 shadow-sm ${isDeleting ? 'border-danger' : task.completed ? 'bg-light border-success' : ''}`}>
       <div className="card-body">
         <div className="d-flex justify-content-between align-items-start mb-2">
-          <h5 
-            role="button"
-            onClick={() => setViewingTask(task)}
-            className={`card-title m-0 text-primary text-decoration-underline-hover ${task.completed ? 'text-decoration-line-through text-muted' : ''}`}
-            style={{ cursor: 'pointer' }}
+          <h5
+            className={`card-title m-0 ${task.completed ? 'text-decoration-line-through text-muted' : ''}`}
           >
-            {task.title}
+            <NavLink
+              to={`/tasks/${task.id}`}
+              className={`text-decoration-none ${
+                task.completed ? 'text-muted' : 'text-primary'
+              }`}
+            >
+              {task.title}
+            </NavLink>
           </h5>
           <div className="d-flex gap-2">
             <span className="badge bg-light text-dark border">{task.category}</span>

@@ -12,6 +12,7 @@ import { TaskDetailModal } from './components/TaskDetailModal';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { AppLayout } from './layouts/AppLayout';
 import { TasksPage } from './pages/TasksPage';
+import { TaskDetailsPage } from './pages/TaskDetailsPage';
 
 function MainContent() {
 
@@ -24,6 +25,8 @@ function MainContent() {
           <Routes>
             <Route path="/" element={<Navigate to="/tasks" replace />} />
             <Route path='/tasks' element={<TasksPage/>}/>
+            <Route path='/tasks/:taskId' element={<TaskDetailsPage/>}/>
+
           </Routes>
 
           {/* <TaskForm />

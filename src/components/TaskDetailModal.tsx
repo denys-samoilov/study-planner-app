@@ -82,7 +82,7 @@ export function TaskDetailModal({ isOpen }: TaskDetailModalProps) {
             )}
 
             {!isLoading && !error && task && (
-              <div className="space-y-3">
+              <div className="d-flex flex-column gap-3">
                 <div className="mb-3">
                   <span className="text-muted small text-uppercase fw-bold d-block">Name</span>
                   <p className="fs-5 fw-medium mb-0">{task.title}</p>

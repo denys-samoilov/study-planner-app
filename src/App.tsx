@@ -1,4 +1,3 @@
-import { Header } from './components/Header';
 import { TaskList } from './components/TaskList';
 import { TaskForm } from './components/TaskForm';
 import { TaskFilters } from './components/TaskFilters';
@@ -10,56 +9,55 @@ import { Toast } from './components/Toast';
 import { Pagination } from './components/Pagination';
 import { TaskDetailModal } from './components/TaskDetailModal';
 
-function MainContent() {
-  const { 
-    tasks, 
-    filter, 
-    search, 
-    editingTask, 
-    deletingTask,
-    toast, 
-    viewingTask,
-    filterTasks,
-    undoDelete
-  } = useTaskContext();
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import { AppLayout } from './layouts/AppLayout';
+import { TasksPage } from './pages/TasksPage';
 
-  
+function MainContent() {
 
   return (
-    <div className="container py-5" style={{ maxWidth: '700px' }}>
-      <Header />
+    <BrowserRouter>
+      <AppLayout>        
 
-      <TaskForm />
+        <div className="container py-5" style={{ maxWidth: '700px' }}>
 
-      <TaskStats tasks={tasks} />
+          <Routes>
+            <Route path="/" element={<Navigate to="/tasks" replace />} />
+            <Route path='/tasks' element={<TasksPage/>}/>
+          </Routes>
 
-      <TaskFilters 
-        currentFilter={filter}
-        currentSearch={search}
-      />
+          {/* <TaskForm />
 
-      <TaskList 
-        tasks={filterTasks()} 
-        currentFilter={filter}
-      />
-      <Pagination/>
+          <TaskStats tasks={tasks} />
 
-      <TaskEditModal 
-        isOpen={editingTask !== null}
-      />
+          <TaskFilters 
+            currentFilter={filter}
+            currentSearch={search}
+          />
 
-      <TaskDetailModal
-        isOpen={viewingTask !== null}
-      />
+          
+          <Pagination/>
 
-      <Toast
-        isOpen={toast !== null}
-        message={toast?.message || ''}
-        type={toast?.type}
-        duration={toast?.duration}
-        onUndo={deletingTask !== undefined ? undoDelete : undefined}
-      />
-    </div>
+          <TaskEditModal 
+            isOpen={editingTask !== null}
+          />
+
+          <TaskDetailModal
+            isOpen={viewingTask !== null}
+          /> */}
+
+          {/* <Toast
+            isOpen={toast !== null}
+            message={toast?.message || ''}
+            type={toast?.type}
+            duration={toast?.duration}
+            onUndo={deletingTask !== undefined ? undoDelete : undefined}
+          /> */}
+
+        </div>
+      </AppLayout>
+
+    </BrowserRouter>
   );
 }
 

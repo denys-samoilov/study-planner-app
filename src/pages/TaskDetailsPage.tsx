@@ -88,7 +88,7 @@ export function TaskDetailsPage() {
       isCancelled = true;
       controller.abort();
     };
-  }, [taskId]);
+  }, [taskId, tasks]);
 
   const handleDelete = async (currentTask: Task) => {
     if(!isAuthenticated){

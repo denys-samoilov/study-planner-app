@@ -15,9 +15,6 @@ export function TaskDetailsPage() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  const createdBy = 'Current User (client-owned)';
-  const createdAt = new Date().toLocaleString();
-
   const navigate = useNavigate();
 
 
@@ -183,14 +180,14 @@ export function TaskDetailsPage() {
                   <span className="text-muted text-uppercase fw-bold d-block">
                     Created By (client-owned)
                   </span>
-                  <span>{createdBy}</span>
+                  <span>{task.createdBy}</span>
                 </div>
 
                 <div className="col-sm-6">
                   <span className="text-muted text-uppercase fw-bold d-block">
                     Created At (client-owned)
                   </span>
-                  <span>{createdAt}</span>
+                  <span>{task.createdAt}</span>
                 </div>
                 <button 
                   onClick={isDeleting ? () => undoDelete() : () => handleDelete(task)}

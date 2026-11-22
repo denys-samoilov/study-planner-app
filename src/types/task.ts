@@ -8,6 +8,8 @@ export class Task {
   priority: Priority;  
   category: string;    
   isDeleting: boolean;
+  createdBy: string | undefined;
+  createdAt: string;
 
   constructor(
     id: number,
@@ -16,7 +18,9 @@ export class Task {
     completed: boolean,
     priority: Priority,
     category: string,
-    isDeleting: boolean = false) 
+    isDeleting: boolean = false,
+    createdBy: string | undefined,
+    createdAt: string) 
     {
     this.id = id;
     this.title = title;
@@ -25,5 +29,7 @@ export class Task {
     this.priority = priority;
     this.category = category;
     this.isDeleting = isDeleting;
+    this.createdBy = createdBy;
+    this.createdAt = createdAt;
   }
 }

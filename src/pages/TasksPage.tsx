@@ -23,7 +23,7 @@ export function TasksPage() {
     undoDelete,
   } = useTaskContext();
 
-  const {isAuthenticated} = useAuthContext();
+  const {isAuthenticated, user} = useAuthContext();
 
   const navigate = useNavigate();
 
@@ -45,7 +45,10 @@ export function TasksPage() {
       data.description,
       false,
       data.priority,
-      data.category
+      data.category,
+      false,
+      user?.id.toString(),
+      new Date().toString()
     );
     await addTask(newTask);
   };

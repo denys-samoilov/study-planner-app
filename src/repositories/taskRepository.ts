@@ -11,7 +11,9 @@ function toTask(todo: ApiTodo): Task {
     completed: todo.completed,
     priority: 'medium',
     category: 'General',
-    isDeleting: false
+    isDeleting: false,
+    createdBy: todo.userId.toString(),
+    createdAt: new Date().toISOString() + ' (client-owned metadata)'
   };
 }
 

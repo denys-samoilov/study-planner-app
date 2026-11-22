@@ -42,7 +42,7 @@ export const taskRepository = {
       signal,
       method: 'POST',
       body: JSON.stringify(toApiTodo(task)),
-    });
+    }, true);
 
     return {
       ...toTask(data),
@@ -57,7 +57,7 @@ export const taskRepository = {
       signal,
       method: 'PUT',
       body: JSON.stringify(toApiTodo(task)),
-    });
+    }, true);
 
     return {
       ...toTask(data),
@@ -71,6 +71,6 @@ export const taskRepository = {
     await httpClient<void>(`/todos/${id}`, {
       signal,
       method: 'DELETE',
-    });
+    }, true);
   },
 };

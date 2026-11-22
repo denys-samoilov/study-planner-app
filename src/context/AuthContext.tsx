@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react';
 import { authRepository } from '../repositories/authRepository';
 import type { AuthUser } from '../types/authUser';
 import { AuthContext } from './authContextType';
+import { setAuthTokenForClient } from '../api/httpClient'
 
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -11,9 +12,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = useCallback(async (username: string, password: string) => {
       const response = await authRepository.login(username, password);
       setAccessToken(response.accessToken);
+      setAuthTokenForClient(response.accessToken);
 
       try {
-        const currentUser = await authRepository.getCurrentUser(response.accessToken);
+        const currentUser = await authRepository.getCurrentUser();
         setUser(currentUser);
       } 
       catch {
@@ -32,6 +34,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = useCallback(() => {
     setAccessToken(null);
     setUser(null);
+    setAuthTokenForClient(null);
   }, []);
 
   return (

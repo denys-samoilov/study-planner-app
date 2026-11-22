@@ -1,11 +1,15 @@
 import type { ReactNode } from 'react';
 import { Link, NavLink } from 'react-router-dom';
+import { useAuthContext } from '../hooks/useAuthContext';
 
 interface AppLayoutProps {
   children: ReactNode;
 }
 
+
 export function AppLayout({ children }: AppLayoutProps) {
+  const {isAuthenticated} = useAuthContext()
+
   return (
     <div className="min-vh-100 d-flex flex-column">
       <header className="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
@@ -33,14 +37,18 @@ export function AppLayout({ children }: AppLayoutProps) {
               Profile
             </NavLink>
 
-            <NavLink
-              to="/login"
-              className={({ isActive }) =>
-                `btn btn-sm ms-2 ${isActive ? 'btn-primary' : 'btn-outline-primary'}`
-              }
-            >
-              Login
-            </NavLink>
+            {!isAuthenticated && (
+              <NavLink
+                to="/login"
+                className={({ isActive }) =>
+                  `btn btn-sm ms-2 ${isActive ? 'btn-primary' : 'btn-outline-primary'}`
+                }
+              >
+                Login
+              </NavLink>
+            )}
+
+            
           </nav>
         </div>
       </header>

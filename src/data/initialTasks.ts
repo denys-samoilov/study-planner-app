@@ -7,7 +7,10 @@ export const initialTasks: Task[] = [
     'Опрацювати базові принципи компонентів React',
     false,
     'high',
-    'React'
+    'React',
+    false,
+    '1',
+    new Date().toISOString()
   ),
   new Task(
     2,
@@ -15,6 +18,9 @@ export const initialTasks: Task[] = [
     'Виконати практичні вправи',
     true,
     'medium',
-    'TypeScript'
+    'TypeScript',
+    false,
+    '1',
+    new Date().toISOString()
   ),
 ];

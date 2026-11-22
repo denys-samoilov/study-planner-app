@@ -111,9 +111,15 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
     if (deletingTaskId === undefined) return;
 
     const timer = setTimeout(async () => {
-      await taskRepository.delete(deletingTaskId);
-      dispatch({ type: 'confirmDelete', payload: deletingTaskId });
-      showToast('Task deleted permanently', 'error');
+      try {
+        await taskRepository.delete(deletingTaskId);
+        dispatch({ type: 'confirmDelete', payload: deletingTaskId });
+        showToast('Task deleted permanently', 'error');
+      }
+      catch(error) {
+        console.log('Failed to delete task: ' + error);
+      }
+      
     }, 5000);
 
     return () => clearTimeout(timer);
@@ -160,9 +166,14 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
 
   const updateTask = async (updatedTask: Task) => {
     try {
-      const data = await taskRepository.update(updatedTask.id, updatedTask);
 
-      dispatch({ type: 'update', payload: data });
+      if(updatedTask.id < 254){
+        const data = await taskRepository.update(updatedTask.id, updatedTask);
+        dispatch({ type: 'update', payload: data });
+      }
+
+      else dispatch({ type: 'update', payload: updatedTask });
+
       setEditingTask(null);
       showToast('Task updated successfully!', 'success');
     } catch (err) {
@@ -182,7 +193,9 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
 
     try {
       dispatch({ type: 'toggle', payload: id });
-      await taskRepository.update(id, updatedTask);
+      if(id < 254){
+        await taskRepository.update(id, updatedTask);
+      }
 
       showToast(
         updatedTask.completed ? 'Task marked as completed' : 'Task marked as active',
@@ -220,7 +233,9 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
     const taskToDelete = tasks.find(task => task.id === id);
     if (!taskToDelete) return;
 
-    await taskRepository.delete(id);
+    if(id < 254){
+      await taskRepository.delete(id);
+    }
     dispatch({ type: 'confirmDelete', payload: id });
     showToast('Task deleted permanently', 'error');
   }

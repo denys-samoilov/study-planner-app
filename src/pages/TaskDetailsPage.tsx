@@ -19,6 +19,7 @@ export function TaskDetailsPage() {
 
 
   const {
+    tasks,
     toast,
     editingTask,
     deletingTask,
@@ -44,6 +45,16 @@ export function TaskDetailsPage() {
         if (!isCancelled) {
           setTask(null);
           setError('Task ID is missing in URL.');
+          setIsLoading(false);
+        }
+        return;
+      }
+
+      const taskFromContext = tasks.find((t) => t.id === Number(taskId));
+
+      if (taskFromContext) {
+        if (!isCancelled) {
+          setTask(taskFromContext);
           setIsLoading(false);
         }
         return;
@@ -138,6 +149,11 @@ export function TaskDetailsPage() {
 
           {!isLoading && !error && task && (
             <>
+              <div className="mb-3">
+                <span className="text-muted small text-uppercase fw-bold d-block">Id</span>
+                <p className="fs-5 fw-semibold mb-0">{task.id}</p>
+              </div>
+
               <div className="mb-3">
                 <span className="text-muted small text-uppercase fw-bold d-block">Name</span>
                 <p className="fs-5 fw-semibold mb-0">{task.title}</p>

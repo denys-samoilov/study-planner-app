@@ -46,6 +46,7 @@ export const taskRepository = {
 
     return {
       ...toTask(data),
+      id: task.id,
       description: task.description,
       priority: task.priority,
       category: task.category,

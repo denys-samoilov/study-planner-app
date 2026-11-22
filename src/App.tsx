@@ -1,12 +1,9 @@
-
 import { TaskProvider } from './context/TaskContext';
 
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { AppLayout } from './layouts/AppLayout';
-import { TasksPage } from './pages/TasksPage';
-import { TaskDetailsPage } from './pages/TaskDetailsPage';
-import { LoginPage } from './pages/LoginPage';
 import { AuthProvider } from './context/AuthContext';
+import { PlannerRoutes } from './routes/PlannerRoutes';
 
 function MainContent() {
 
@@ -15,13 +12,7 @@ function MainContent() {
 
         <div className="container py-5" style={{ maxWidth: '700px' }}>
 
-          <Routes>
-            <Route path="/" element={<Navigate to="/tasks" replace />} />
-            <Route path='/tasks' element={<TasksPage/>}/>
-            <Route path='/tasks/:taskId' element={<TaskDetailsPage/>}/>
-            <Route path='/login' element={<LoginPage/>}/>
-
-          </Routes>
+          <PlannerRoutes/>
 
           {/* <TaskForm />
 

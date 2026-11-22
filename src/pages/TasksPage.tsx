@@ -9,6 +9,8 @@ import { TaskFormDialog } from '../components/TaskFormDialog';
 import { Task } from '../types/task';
 import type { TaskFormData } from '../schemas/taskSchema';
 import { TaskStats } from '../components/TaskStats';
+import { useAuthContext } from '../hooks/useAuthContext';
+import { useNavigate } from 'react-router-dom';
 
 export function TasksPage() {
   const {
@@ -21,7 +23,20 @@ export function TasksPage() {
     undoDelete,
   } = useTaskContext();
 
+  const {isAuthenticated} = useAuthContext();
+
+  const navigate = useNavigate();
+
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+
+  const handleCreateDialogOpen = () => {
+    if(!isAuthenticated)
+    {
+      navigate('/login');
+      return;
+    }
+    setIsCreateDialogOpen(true);
+  }
 
   const handleCreateTask = async (data: TaskFormData) => {
     const newTask = new Task(
@@ -45,7 +60,7 @@ export function TasksPage() {
           type="button"
           className="btn btn-primary"
           aria-label="Create task"
-          onClick={() => setIsCreateDialogOpen(true)}
+          onClick={() => handleCreateDialogOpen()}
         >
           +
         </button>

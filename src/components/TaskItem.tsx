@@ -2,6 +2,7 @@ import { Task } from '../types/task';
 import { useTaskContext } from '../hooks/useTaskContext';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../hooks/useAuthContext';
+import { getPriorityBadgeClass } from '../types/getPriorityBadgeClass';
 
 interface TaskItemProps {
   task: Task;
@@ -14,15 +15,6 @@ export function TaskItem({ task }: TaskItemProps) {
   const isDeleting = task.isDeleting;
 
   const navigate = useNavigate();
-
-  const getPriorityBadgeClass = (priority: string): string => {
-    switch (priority) {
-      case 'high': return 'bg-danger';
-      case 'medium': return 'bg-warning text-dark';
-      case 'low': return 'bg-success';
-      default: return 'bg-secondary';
-    }
-  };
 
   const handleToggleTask = () => {
     if(!isAuthenticated)

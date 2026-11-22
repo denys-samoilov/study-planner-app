@@ -7,6 +7,7 @@ import type { TaskFormData } from '../schemas/taskSchema';
 import { TaskFormDialog } from '../components/TaskFormDialog';
 import { Toast } from '../components/Toast';
 import { useAuthContext } from '../hooks/useAuthContext';
+import { getPriorityBadgeClass } from '../types/getPriorityBadgeClass';
 
 export function TaskDetailsPage() {
   const { taskId } = useParams<{ taskId: string }>();
@@ -120,6 +121,7 @@ export function TaskDetailsPage() {
     
   };
 
+
   return (
     <div>
       <div className="mb-3">
@@ -172,7 +174,7 @@ export function TaskDetailsPage() {
 
                 <div className="col-sm-4">
                   <span className="text-muted small text-uppercase fw-bold d-block">Priority</span>
-                  <span className="badge bg-warning text-dark text-uppercase mt-1">
+                  <span className={`badge ${getPriorityBadgeClass(task.priority)} text-dark text-uppercase mt-1`}>
                     {task.priority}
                   </span>
                 </div>

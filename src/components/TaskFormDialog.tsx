@@ -32,8 +32,6 @@ function getFormValues(mode: 'create' | 'edit', task?: Task): TaskFormData {
 
 export function TaskFormDialog({ open, mode, task, onClose, onSubmit,}: TaskFormDialogProps) {
 
-  if(!open) return;
-
   const {
   register,
   handleSubmit,
@@ -43,6 +41,7 @@ export function TaskFormDialog({ open, mode, task, onClose, onSubmit,}: TaskForm
   defaultValues: getFormValues(mode, task),
 });
 
+  if(!open) return;
 
 
   const isLocked = isSubmitting;

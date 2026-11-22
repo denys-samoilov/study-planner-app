@@ -10,8 +10,6 @@ export function LoginPage() {
   const navigate = useNavigate();
   const [submitError, setSubmitError] = useState<string | null>(null);
 
-
-
   const {
     register,
     handleSubmit,
@@ -27,9 +25,9 @@ export function LoginPage() {
       navigate('/tasks');
     } 
     catch (error) {
+      console.error('Login error:', error);
       setSubmitError('Login failed. Please check your username and password.');
-    }
-  };
+    };}
 
   return (
     <div className="row justify-content-center mt-4">

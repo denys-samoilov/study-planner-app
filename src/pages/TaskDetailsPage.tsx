@@ -92,7 +92,11 @@ export function TaskDetailsPage() {
 
   const handleSaveEdit = async (data: TaskFormData) => {
     if (!editingTask) return;
-   
+
+    if(!isAuthenticated){
+      navigate('/login');
+      return;
+    }
 
     const updatedTask: Task = {
       ...editingTask,

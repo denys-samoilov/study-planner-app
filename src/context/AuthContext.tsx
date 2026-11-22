@@ -1,16 +1,8 @@
-import { createContext, useCallback, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { authRepository } from '../repositories/authRepository';
 import type { AuthUser } from '../types/authUser';
+import { AuthContext } from './authContextType';
 
-interface AuthContextValue {
-  user: AuthUser | null;
-  accessToken: string | null;
-  isAuthenticated: boolean;
-  login: (username: string, password: string) => Promise<void>;
-  logout: () => void;
-}
-
-export const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);

@@ -6,6 +6,7 @@ import { useTaskContext } from '../hooks/useTaskContext';
 import type { TaskFormData } from '../schemas/taskSchema';
 import { TaskFormDialog } from '../components/TaskFormDialog';
 import { Toast } from '../components/Toast';
+import { useAuthContext } from '../hooks/useAuthContext';
 
 export function TaskDetailsPage() {
   const { taskId } = useParams<{ taskId: string }>();
@@ -29,6 +30,8 @@ export function TaskDetailsPage() {
     undoDelete,
     setEditingTask
   } = useTaskContext();
+
+  const {isAuthenticated} = useAuthContext();
 
   const isDeleting = deletingTask?.id === task?.id;
 
@@ -54,14 +57,16 @@ export function TaskDetailsPage() {
         if (!isCancelled) {
           setTask(fetchedTask);
         }
-      } catch (err: unknown) {
+      } 
+      catch (err: unknown) {
         if (err instanceof Error && err.name === 'AbortError') {
           return;
         }
         if (!isCancelled) {
-          setError(err instanceof Error ? err.message : 'Failed to load task details.');
+          setError('Failed to load task details.');
         }
-      } finally {
+      } 
+      finally {
         if (!isCancelled) {
           setIsLoading(false);
         }
@@ -77,6 +82,10 @@ export function TaskDetailsPage() {
   }, [taskId]);
 
   const handleDelete = async (currentTask: Task) => {
+    if(!isAuthenticated){
+      navigate('/login');
+      return;
+    }
     await deleteInstantly(currentTask.id);
     navigate('/tasks');
 };

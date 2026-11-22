@@ -1,6 +1,7 @@
 import { Task } from '../types/task';
 import { useTaskContext } from '../hooks/useTaskContext';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuthContext } from '../hooks/useAuthContext';
 
 interface TaskItemProps {
   task: Task;
@@ -8,8 +9,11 @@ interface TaskItemProps {
 
 export function TaskItem({ task }: TaskItemProps) {
   const { toggleTask } = useTaskContext();
+  const {isAuthenticated} = useAuthContext();
 
   const isDeleting = task.isDeleting;
+
+  const navigate = useNavigate();
 
   const getPriorityBadgeClass = (priority: string): string => {
     switch (priority) {
@@ -19,6 +23,15 @@ export function TaskItem({ task }: TaskItemProps) {
       default: return 'bg-secondary';
     }
   };
+
+  const handleToggleTask = () => {
+    if(!isAuthenticated)
+    {
+      navigate('/login');
+      return;
+    }
+    toggleTask(task.id); 
+  }
 
   return (
     <div className={`card mb-3 shadow-sm ${isDeleting ? 'border-danger' : task.completed ? 'bg-light border-success' : ''}`}>
@@ -56,7 +69,7 @@ export function TaskItem({ task }: TaskItemProps) {
           <div className="d-flex gap-2">
             {!isDeleting && (
               <button 
-                onClick={() => toggleTask(task.id)}
+                onClick={() => handleToggleTask()}
                 className={`btn btn-sm ${task.completed ? 'btn-outline-warning' : 'btn-outline-success'}`}
               >
                 {task.completed ? 'Return' : 'Finish'}

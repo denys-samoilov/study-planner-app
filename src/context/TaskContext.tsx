@@ -37,8 +37,10 @@ interface TaskContextType {
   addTask: (task: Task) => void;
   updateTask: (task: Task) => void;
   toggleTask: (id: number) => void;
-  requestDelete: (id: number | string) => void;
+  requestDelete: (id: number) => void;
   undoDelete: () => void;
+  deleteInstantly: (id: number) => void;
+
   clearCompleted: () => void;
   resetTasks: () => void;
 }
@@ -228,7 +230,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const requestDelete = (id: number | string) => {
+  const requestDelete = (id: number) => {
     const taskToDelete = tasks.find(task => task.id === id);
     if (!taskToDelete) return;
 
@@ -241,12 +243,23 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
     );
   };
 
+
   const undoDelete = () => {
     if (deletingTask) {
       dispatch({ type: 'undoDelete', payload: deletingTask.id });
       showToast('Deletion cancelled', 'info');
     }
   };
+
+  const deleteInstantly = async (id: number) => {
+    const taskToDelete = tasks.find(task => task.id === id);
+    if (!taskToDelete) return;
+
+    await taskRepository.delete(id);
+    dispatch({ type: 'confirmDelete', payload: id });
+    showToast('Task deleted permanently', 'error');
+  }
+
 
   const clearCompleted = () => {
     dispatch({ type: 'clearCompleted' });
@@ -286,6 +299,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
         toggleTask,
         requestDelete,
         undoDelete,
+        deleteInstantly,
         clearCompleted,
         resetTasks,
       }}

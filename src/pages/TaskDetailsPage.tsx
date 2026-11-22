@@ -1,7 +1,11 @@
 import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { taskRepository } from '../repositories/taskRepository';
 import type { Task } from '../types/task';
+import { useTaskContext } from '../hooks/useTaskContext';
+import type { TaskFormData } from '../schemas/taskSchema';
+import { TaskFormDialog } from '../components/TaskFormDialog';
+import { Toast } from '../components/Toast';
 
 export function TaskDetailsPage() {
   const { taskId } = useParams<{ taskId: string }>();
@@ -12,6 +16,21 @@ export function TaskDetailsPage() {
 
   const createdBy = 'Current User (client-owned)';
   const createdAt = new Date().toLocaleString();
+
+  const navigate = useNavigate();
+
+
+  const {
+    toast,
+    editingTask,
+    deletingTask,
+    updateTask,
+    deleteInstantly,
+    undoDelete,
+    setEditingTask
+  } = useTaskContext();
+
+  const isDeleting = deletingTask?.id === task?.id;
 
   useEffect(() => {
     const controller = new AbortController();
@@ -49,13 +68,40 @@ export function TaskDetailsPage() {
       }
     }
 
-    void loadTask();
+    loadTask();
 
     return () => {
       isCancelled = true;
       controller.abort();
     };
   }, [taskId]);
+
+  const handleDelete = async (currentTask: Task) => {
+    await deleteInstantly(currentTask.id);
+    navigate('/tasks');
+};
+
+  const handleSaveEdit = async (data: TaskFormData) => {
+    if (!editingTask) return;
+   
+
+    const updatedTask: Task = {
+      ...editingTask,
+      title: data.title,
+      description: data.description,
+      category: data.category,
+      priority: data.priority,
+    };
+
+    try {
+      await updateTask(updatedTask);
+      setTask(updatedTask);
+      
+    } 
+    catch (err: unknown) {
+      throw err;
+    }
+  };
 
   return (
     <div>
@@ -137,7 +183,39 @@ export function TaskDetailsPage() {
                   </span>
                   <span>{createdAt}</span>
                 </div>
+                <button 
+                  onClick={isDeleting ? () => undoDelete() : () => handleDelete(task)}
+                  className="btn btn-sm btn-danger"
+                >
+                  {isDeleting ? "Undo" : "Delete Task"}
+                </button>
+                        
+                {!isDeleting && (
+                  <button 
+                    onClick={() => setEditingTask(task)}
+                    className="btn btn-sm btn-outline-primary"
+                  >
+                    Edit Task
+                  </button>
+                )}
               </div>
+              <TaskFormDialog
+                  key={editingTask ? `edit-${editingTask.id}` : 'edit-closed'}
+                  open={Boolean(editingTask)}
+                  mode="edit"
+                  task={editingTask ?? undefined}
+                  onClose={() => setEditingTask(null)}
+                  onSubmit={handleSaveEdit}
+                />
+
+              <Toast
+                isOpen={toast !== null}
+                message={toast?.message || ''}
+                type={toast?.type}
+                duration={toast?.duration}
+                onUndo={deletingTask !== undefined ? undoDelete : undefined}
+              />
+              
             </>
           )}
         </div>

@@ -3,24 +3,19 @@ import { useTaskContext } from '../hooks/useTaskContext';
 import { Header } from '../components/Header';
 import { TaskList } from '../components/TaskList';
 import { TaskFilters } from '../components/TaskFilters';
-import { TaskStats } from '../components/TaskStats';
-import { TaskEditModal } from '../components/TaskEditModal';
 import { Toast } from '../components/Toast';
 import { Pagination } from '../components/Pagination';
-import { TaskDetailModal } from '../components/TaskDetailModal';
 import { TaskFormDialog } from '../components/TaskFormDialog';
 import { Task } from '../types/task';
 import type { TaskFormData } from '../schemas/taskSchema';
+import { TaskStats } from '../components/TaskStats';
 
 export function TasksPage() {
   const {
-    tasks,
     filter,
     search,
-    editingTask,
     deletingTask,
     toast,
-    viewingTask,
     addTask,
     filterTasks,
     undoDelete,
@@ -43,6 +38,7 @@ export function TasksPage() {
   return (
     <div className="mx-auto" style={{ maxWidth: '700px' }}>
       <Header />
+      <TaskStats tasks={filterTasks()} />
 
       <div className="d-flex justify-content-end mb-3">
         <button
@@ -63,8 +59,6 @@ export function TasksPage() {
         onSubmit={handleCreateTask}
       />
 
-      <TaskStats tasks={tasks} />
-
       <TaskFilters
         currentFilter={filter}
         currentSearch={search}
@@ -76,14 +70,6 @@ export function TasksPage() {
       />
 
       <Pagination />
-
-      <TaskEditModal
-        isOpen={editingTask !== null}
-      />
-
-      <TaskDetailModal
-        isOpen={viewingTask !== null}
-      />
 
       <Toast
         isOpen={toast !== null}

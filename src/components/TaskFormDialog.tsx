@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { taskSchema, type TaskFormData } from '../schemas/taskSchema';
@@ -33,27 +33,18 @@ function getFormValues(mode: 'create' | 'edit', task?: Task): TaskFormData {
 
 export function TaskFormDialog({ open, mode, task, onClose, onSubmit,}: TaskFormDialogProps) {
 
+  if(!open) return;
+
   const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors, isSubmitting },
-  } = useForm<TaskFormData>({
-    resolver: zodResolver(taskSchema),
-    defaultValues: getFormValues(mode, task),
-  });
+  register,
+  handleSubmit,
+  formState: { errors, isSubmitting },
+} = useForm<TaskFormData>({
+  resolver: zodResolver(taskSchema),
+  defaultValues: getFormValues(mode, task),
+});
 
 
-
-  useEffect(() => {
-    if (!open) return;
-    reset(getFormValues(mode, task));
-  }, [open, mode, task, reset]);
-
- 
-
-
-  if (!open) return null;
 
   const isLocked = isSubmitting;
   const headingText = mode === 'create' ? 'Add Task Form' : 'Edit Task Form';
@@ -67,6 +58,8 @@ export function TaskFormDialog({ open, mode, task, onClose, onSubmit,}: TaskForm
     await onSubmit(data);
     onClose();
   };
+
+  
 
   return (
     <div

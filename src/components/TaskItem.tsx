@@ -62,22 +62,7 @@ export function TaskItem({ task }: TaskItemProps) {
                 {task.completed ? 'Return' : 'Finish'}
               </button>
             )}
-
-            <button 
-              onClick={isDeleting ? () => undoDelete() : () => requestDelete(task.id)}
-              className="btn btn-sm btn-danger"
-            >
-              {isDeleting ? "Undo" : "Delete Task"}
-            </button>
-
-            {!isDeleting && (
-              <button 
-                onClick={() => setEditingTask(task)}
-                className="btn btn-sm btn-outline-primary"
-              >
-                Edit Task
-              </button>
-            )}
+          
           </div>
         </div>
       </div>

@@ -1,11 +1,11 @@
 
 import { TaskProvider } from './context/TaskContext';
 
-
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { AppLayout } from './layouts/AppLayout';
 import { TasksPage } from './pages/TasksPage';
 import { TaskDetailsPage } from './pages/TaskDetailsPage';
+import { AuthProvider } from './context/AuthContext';
 
 function MainContent() {
 
@@ -58,9 +58,11 @@ function MainContent() {
 export function App() {
   return (
     <BrowserRouter>
-      <TaskProvider>
-        <MainContent />
-      </TaskProvider>
+      <AuthProvider>
+        <TaskProvider>
+          <MainContent />
+        </TaskProvider>
+      </AuthProvider>
     </BrowserRouter>
 
   );

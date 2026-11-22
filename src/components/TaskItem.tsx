@@ -1,13 +1,13 @@
 import { Task } from '../types/task';
 import { useTaskContext } from '../hooks/useTaskContext';
-import { NavLink } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 interface TaskItemProps {
   task: Task;
 }
 
 export function TaskItem({ task }: TaskItemProps) {
-  const { toggleTask, requestDelete, undoDelete, setEditingTask } = useTaskContext();
+  const { toggleTask } = useTaskContext();
 
   const isDeleting = task.isDeleting;
 
@@ -27,14 +27,14 @@ export function TaskItem({ task }: TaskItemProps) {
           <h5
             className={`card-title m-0 ${task.completed ? 'text-decoration-line-through text-muted' : ''}`}
           >
-            <NavLink
+            <Link
               to={`/tasks/${task.id}`}
               className={`text-decoration-none ${
                 task.completed ? 'text-muted' : 'text-primary'
               }`}
             >
               {task.title}
-            </NavLink>
+            </Link>
           </h5>
           <div className="d-flex gap-2">
             <span className="badge bg-light text-dark border">{task.category}</span>

@@ -93,14 +93,10 @@ export function TaskDetailsPage() {
       priority: data.priority,
     };
 
-    try {
       await updateTask(updatedTask);
       setTask(updatedTask);
       
-    } 
-    catch (err: unknown) {
-      throw err;
-    }
+    
   };
 
   return (

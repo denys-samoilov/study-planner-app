@@ -25,6 +25,7 @@ interface TaskContextType {
   toast: ToastState | null;
   isLoading: boolean;
   error: string | null;
+  totalTasksOnStart: number;
   fetchTasksForPage: () => void;
   nextPage: () => void;
   prevPage: () => void;
@@ -52,6 +53,8 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   const [tasks, dispatch] = useReducer(taskReducer, []);
   const [viewingTask, setViewingTask] = useState<Task | null>(null);
 
+  const [totalTasksOnStart, setTotalTasksOnStart] = useState<number>(0);
+  
   const [searchParams, setSearchParams] = useSearchParams();
 
 
@@ -112,6 +115,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
       const skip = (page - 1) * limit;
       const serverTasks = await taskRepository.getAll(limit, skip, signal);
       dispatch({ type: 'setTasks', payload: serverTasks });
+      setTotalTasksOnStart(serverTasks.length);
     } catch (error: unknown) {
       if (error instanceof Error && error.name == 'AbortError') {
         console.log('Fetch aborted');
@@ -158,6 +162,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     document.title = 'Study Planner - Page ' + page;
   }, [page]);
+
 
   const filterTasks = (): Task[] => {
     let filteredTasks = tasks;
@@ -285,6 +290,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
         toast,
         isLoading,
         error,
+        totalTasksOnStart,
         fetchTasksForPage,
         nextPage,
         prevPage,

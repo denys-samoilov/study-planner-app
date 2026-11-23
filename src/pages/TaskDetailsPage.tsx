@@ -99,6 +99,14 @@ export function TaskDetailsPage() {
     navigate('/tasks');
 };
 
+  const handleEditButtonClick = () => {
+    if(!isAuthenticated){
+      navigate('/login');
+      return;
+    }
+    setEditingTask(task);
+  }
+
   const handleSaveEdit = async (data: TaskFormData) => {
     if (!editingTask) return;
 
@@ -216,7 +224,7 @@ export function TaskDetailsPage() {
                         
                 {!isDeleting && (
                   <button 
-                    onClick={() => setEditingTask(task)}
+                    onClick={() => handleEditButtonClick()}
                     className="btn btn-sm btn-outline-primary"
                   >
                     Edit Task
